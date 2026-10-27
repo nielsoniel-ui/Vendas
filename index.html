@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,20 +9,50 @@
     /* ── RESET & BASE ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg:        #0f1117;
-      --surface:   #1a1d27;
-      --surface2:  #222536;
-      --surface3:  #2a2e45;
-      --border:    #2e3148;
-      --accent:    #6c63ff;
+    :root, [data-theme="dark"] {
+      --bg:           #0f1117;
+      --header-bg:    linear-gradient(135deg, #1a1d27 0%, #12142a 100%);
+      --surface:      #1a1d27;
+      --surface2:     #222536;
+      --surface3:     #2a2e45;
+      --border:       #2e3148;
+      --border-subtle:rgba(46,49,72,.45);
+      --accent:       #6c63ff;
       --accent-hover: #584ef0;
-      --accent2:   #00d4aa;
-      --accent3:   #ff6b6b;
-      --accent4:   #ffd166;
-      --text:      #e8eaf6;
-      --muted:     #8b8fa8;
-      --radius:    14px;
+      --accent2:      #00d4aa;
+      --accent3:      #ff6b6b;
+      --accent4:      #ffd166;
+      --accent-cyan:  #22d3ee;
+      --text:         #e8eaf6;
+      --muted:        #8b8fa8;
+      --chart-tick:   #8b8fa8;
+      --chart-grid:   rgba(46,49,72,.4);
+      --modal-bg:     rgba(0,0,0,.75);
+      --card-shadow:  rgba(0,0,0,.35);
+      --radius:       14px;
+    }
+
+    [data-theme="light"] {
+      --bg:           #f5f7fb;
+      --header-bg:    linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      --surface:      #ffffff;
+      --surface2:     #f8fafc;
+      --surface3:     #e2e8f0;
+      --border:       #e2e8f0;
+      --border-subtle:rgba(226,232,240,.9);
+      --accent:       #584ef0;
+      --accent-hover: #453bc7;
+      --accent2:      #059669;
+      --accent3:      #e11d48;
+      --accent4:      #d97706;
+      --accent-cyan:  #0284c7;
+      --text:         #0f172a;
+      --muted:        #64748b;
+      --chart-tick:   #64748b;
+      --chart-grid:   rgba(226,232,240,.8);
+      --modal-bg:     rgba(15,23,42,.6);
+      --card-shadow:  rgba(0,0,0,.08);
+      --radius:       14px;
     }
 
     body {
@@ -31,11 +61,28 @@
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
+      transition: background-color .25s ease, color .25s ease;
+    }
+
+    /* ── SVG ICONS ── */
+    .svg-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1em;
+      height: 1em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: middle;
+      flex-shrink: 0;
     }
 
     /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, #1a1d27 0%, #12142a 100%);
+      background: var(--header-bg);
       border-bottom: 1px solid var(--border);
       padding: 16px 40px;
       display: flex;
@@ -45,6 +92,7 @@
       top: 0;
       z-index: 100;
       backdrop-filter: blur(12px);
+      transition: background .25s, border-color .25s;
     }
 
     .logo {
@@ -58,6 +106,7 @@
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
+      color: #fff;
       font-size: 22px;
       box-shadow: 0 4px 16px rgba(108,99,255,.3);
     }
@@ -68,16 +117,17 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 18px;
+      padding: 9px 16px;
       border-radius: 10px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
       cursor: pointer;
       border: 1px solid transparent;
@@ -91,7 +141,7 @@
     }
     .btn-primary:hover {
       background: var(--accent-hover);
-      box-shadow: 0 6px 20px rgba(108,99,255,.4);
+      box-shadow: 0 6px 20px rgba(108,99,255,.35);
       transform: translateY(-1px);
     }
 
@@ -105,9 +155,28 @@
       border-color: var(--accent);
     }
 
+    .btn-theme-toggle {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+    }
+    .btn-theme-toggle:hover {
+      border-color: var(--accent);
+      background: var(--surface3);
+    }
+
     .badge {
-      background: rgba(108,99,255,.15);
-      border: 1px solid rgba(108,99,255,.3);
+      background: rgba(108,99,255,.12);
+      border: 1px solid rgba(108,99,255,.25);
       color: var(--accent);
       padding: 6px 14px;
       border-radius: 20px;
@@ -115,12 +184,12 @@
       font-weight: 600;
     }
 
-    /* ── BARRA DE FILTRO ATIVO (INTERATIVO) ── */
+    /* ── BARRA DE FILTRO INTERATIVO ATIVO ── */
     .active-filter-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(90deg, rgba(108,99,255,.2), rgba(0,212,170,.15));
+      background: linear-gradient(90deg, rgba(108,99,255,.16), rgba(0,212,170,.12));
       border: 1px solid var(--accent);
       border-radius: 12px;
       padding: 12px 20px;
@@ -140,14 +209,17 @@
     }
 
     .btn-clear-filter {
-      background: rgba(255,107,107,.2);
+      background: rgba(255,107,107,.18);
       border: 1px solid var(--accent3);
-      color: #ff9e9e;
+      color: var(--accent3);
       border-radius: 8px;
       padding: 6px 14px;
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       transition: all .2s;
     }
     .btn-clear-filter:hover {
@@ -188,6 +260,9 @@
       letter-spacing: 0;
       text-transform: none;
       font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* ── KPI CARDS ── */
@@ -204,12 +279,13 @@
       padding: 22px;
       position: relative;
       overflow: hidden;
-      transition: transform .2s, box-shadow .2s;
+      transition: transform .2s, box-shadow .2s, background .25s, border-color .25s;
+      box-shadow: 0 4px 14px var(--card-shadow);
     }
 
     .kpi-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(0,0,0,.35);
+      box-shadow: 0 12px 28px var(--card-shadow);
     }
 
     .kpi-card::before {
@@ -223,7 +299,7 @@
     .kpi-card.green::before  { background: linear-gradient(90deg, var(--accent2), #00f0c0); }
     .kpi-card.red::before    { background: linear-gradient(90deg, var(--accent3), #ff8e53); }
     .kpi-card.yellow::before { background: linear-gradient(90deg, var(--accent4), #ffb347); }
-    .kpi-card.cyan::before   { background: linear-gradient(90deg, #22d3ee, #0284c7); }
+    .kpi-card.cyan::before   { background: linear-gradient(90deg, var(--accent-cyan), #0284c7); }
 
     .kpi-icon {
       width: 42px; height: 42px;
@@ -233,14 +309,14 @@
       margin-bottom: 14px;
     }
 
-    .kpi-card.purple .kpi-icon { background: rgba(108,99,255,.15); }
-    .kpi-card.green  .kpi-icon { background: rgba(0,212,170,.15); }
-    .kpi-card.red    .kpi-icon { background: rgba(255,107,107,.15); }
-    .kpi-card.yellow .kpi-icon { background: rgba(255,209,102,.15); }
-    .kpi-card.cyan   .kpi-icon { background: rgba(34,211,238,.15); }
+    .kpi-card.purple .kpi-icon { background: rgba(108,99,255,.14); color: var(--accent); }
+    .kpi-card.green  .kpi-icon { background: rgba(0,212,170,.14); color: var(--accent2); }
+    .kpi-card.red    .kpi-icon { background: rgba(255,107,107,.14); color: var(--accent3); }
+    .kpi-card.yellow .kpi-icon { background: rgba(255,209,102,.14); color: var(--accent4); }
+    .kpi-card.cyan   .kpi-icon { background: rgba(34,211,238,.14); color: var(--accent-cyan); }
 
     .kpi-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-    .kpi-value { font-size: 1.65rem; font-weight: 700; line-height: 1.1; }
+    .kpi-value { font-size: 1.62rem; font-weight: 700; line-height: 1.1; }
     .kpi-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
 
     /* ── CARDS & GRÁFICOS INTERATIVOS ── */
@@ -261,10 +337,11 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 24px;
-      transition: box-shadow .2s;
+      transition: box-shadow .2s, background .25s, border-color .25s;
+      box-shadow: 0 4px 14px var(--card-shadow);
     }
 
-    .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.25); }
+    .card:hover { box-shadow: 0 8px 24px var(--card-shadow); }
 
     .card-title {
       font-size: 0.95rem;
@@ -289,7 +366,6 @@
       background: var(--accent);
     }
 
-    /* Controles interativos dentro dos títulos dos gráficos */
     .chart-controls {
       display: flex;
       align-items: center;
@@ -354,7 +430,7 @@
       align-items: center;
       gap: 16px;
       cursor: pointer;
-      transition: transform .2s, border-color .2s;
+      transition: transform .2s, border-color .2s, background .25s;
     }
     .profit-box:hover {
       transform: translateY(-2px);
@@ -376,7 +452,24 @@
       border-color: var(--accent3);
     }
 
-    .profit-box-icon { font-size: 32px; }
+    .profit-box-icon {
+      font-size: 30px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .profit-box.best .profit-box-icon {
+      background: rgba(0,212,170,.15);
+      color: var(--accent2);
+    }
+    .profit-box.worst .profit-box-icon {
+      background: rgba(255,107,107,.15);
+      color: var(--accent3);
+    }
 
     .profit-box-title {
       font-size: 0.8rem;
@@ -430,7 +523,7 @@
     }
 
     tbody tr {
-      border-bottom: 1px solid rgba(46,49,72,.45);
+      border-bottom: 1px solid var(--border-subtle);
       transition: background .15s;
     }
 
@@ -454,6 +547,9 @@
     .produto-badge:hover { opacity: 0.85; }
 
     .cidade-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       padding: 3px 10px;
       border-radius: 20px;
       font-size: 0.78rem;
@@ -462,9 +558,9 @@
     }
     .cidade-tag:hover { opacity: 0.85; }
 
-    .cidade-maputo  { background: rgba(108,99,255,.15); color: #9c88ff; }
-    .cidade-matola  { background: rgba(0,212,170,.15);  color: var(--accent2); }
-    .cidade-boane   { background: rgba(255,209,102,.15);color: var(--accent4); }
+    .cidade-maputo  { background: rgba(108,99,255,.14); color: var(--accent); }
+    .cidade-matola  { background: rgba(0,212,170,.14);  color: var(--accent2); }
+    .cidade-boane   { background: rgba(255,209,102,.14);color: var(--accent4); }
 
     .valor { font-weight: 700; color: var(--accent2); }
 
@@ -501,7 +597,7 @@
     .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb300); color: #000; }
     .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); color: #000; }
     .rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); color: #fff; }
-    .rank-n { background: var(--border); color: var(--muted); }
+    .rank-n { background: var(--surface3); color: var(--muted); border: 1px solid var(--border); }
 
     .cliente-avatar {
       width: 36px; height: 36px;
@@ -517,7 +613,7 @@
 
     .progress-bar {
       height: 6px;
-      background: var(--border);
+      background: var(--surface3);
       border-radius: 3px;
       overflow: hidden;
       margin-top: 6px;
@@ -532,13 +628,27 @@
       margin-bottom: 20px;
     }
 
-    .search-input {
+    .search-input-box {
       flex: 2;
       min-width: 220px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input-box .svg-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 16px;
+      padding: 10px 14px 10px 40px;
       color: var(--text);
       font-size: 0.9rem;
       outline: none;
@@ -565,7 +675,7 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.75);
+      background: var(--modal-bg);
       backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
@@ -589,7 +699,7 @@
       width: 100%;
       max-width: 520px;
       padding: 30px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
       transform: translateY(20px);
       transition: transform .25s ease;
     }
@@ -603,17 +713,26 @@
       margin-bottom: 24px;
     }
 
-    .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
     .modal-close {
       background: none;
       border: none;
       color: var(--muted);
-      font-size: 24px;
       cursor: pointer;
-      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 8px;
     }
-    .modal-close:hover { color: var(--text); }
+    .modal-close:hover { color: var(--text); background: var(--surface2); }
 
     .form-group { margin-bottom: 16px; }
 
@@ -667,10 +786,10 @@
       right: 24px;
       background: var(--surface2);
       border: 1px solid var(--accent);
-      color: #fff;
+      color: var(--text);
       padding: 14px 22px;
       border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -721,67 +840,81 @@
 <!-- ─── HEADER ─── -->
 <header>
   <div class="logo">
-    <div class="logo-icon">📊</div>
+    <div class="logo-icon" id="logoIconContainer"></div>
     <div>
       <h1>MUV Documents</h1>
       <span>Sistema de Gestão & Rentabilidade de Vendas</span>
     </div>
   </div>
   <div class="header-actions">
+    <!-- Botão de Alternância de Tema Preto / Branco -->
+    <button class="btn-theme-toggle" id="btnThemeToggle" onclick="alternarTema()">
+      <span id="themeIcon"></span>
+      <span id="themeLabel">Modo Claro</span>
+    </button>
     <span class="badge" id="badgeTotalVendas">100 Vendas</span>
     <button class="btn btn-secondary" onclick="exportarCSV()">
-      📥 Exportar CSV
+      <span class="icon-slot" data-icon="download"></span>
+      <span>Exportar CSV</span>
     </button>
     <button class="btn btn-primary" onclick="abrirModalVenda()">
-      ➕ Nova Venda
+      <span class="icon-slot" data-icon="plus"></span>
+      <span>Nova Venda</span>
     </button>
   </div>
 </header>
 
 <main>
 
-  <!-- ─── BARRA DE FILTRO INTERATIVO ATIVO (QUANDO CLICADO NUM GRÁFICO) ─── -->
+  <!-- ─── BARRA DE FILTRO INTERATIVO ATIVO ─── -->
   <div class="active-filter-bar" id="activeFilterBar" style="display:none;">
     <div class="active-filter-text">
-      <span>🎯 Filtro Interativo Ativo:</span>
+      <span class="icon-slot" data-icon="filter" style="color:var(--accent)"></span>
+      <span>Filtro Interativo Ativo:</span>
       <strong id="activeFilterDesc"></strong>
     </div>
-    <button class="btn-clear-filter" onclick="limparFiltroInterativo()">✖ Limpar Filtro do Gráfico</button>
+    <button class="btn-clear-filter" onclick="limparFiltroInterativo()">
+      <span class="icon-slot" data-icon="x"></span>
+      <span>Limpar Filtro</span>
+    </button>
   </div>
 
   <!-- ─── KPI CARDS ─── -->
   <section>
     <div class="section-title">
-      <span>📈 Resumo Financeiro & Operacional</span>
-      <span class="interactive-hint">💡 Dica: Clique nos gráficos para filtrar todo o painel</span>
+      <span>Resumo Financeiro & Operacional</span>
+      <span class="interactive-hint">
+        <span class="icon-slot" data-icon="info"></span>
+        Clique nos gráficos para filtrar todo o painel
+      </span>
     </div>
     <div class="kpi-grid">
       <div class="kpi-card purple">
-        <div class="kpi-icon">💰</div>
+        <div class="kpi-icon" id="iconKpiReceita"></div>
         <div class="kpi-label">Receita Bruta</div>
         <div class="kpi-value" id="kpiReceita">0 MT</div>
         <div class="kpi-sub">Total faturado</div>
       </div>
       <div class="kpi-card green">
-        <div class="kpi-icon">📈</div>
+        <div class="kpi-icon" id="iconKpiLucro"></div>
         <div class="kpi-label">Lucro Estimado</div>
         <div class="kpi-value" id="kpiLucro">0 MT</div>
         <div class="kpi-sub" id="kpiMargem">Margem média: 0%</div>
       </div>
       <div class="kpi-card cyan">
-        <div class="kpi-icon">📦</div>
+        <div class="kpi-icon" id="iconKpiQtd"></div>
         <div class="kpi-label">Unidades Vendidas</div>
         <div class="kpi-value" id="kpiUnidades">0</div>
         <div class="kpi-sub" id="kpiRegistos">0 transações</div>
       </div>
       <div class="kpi-card red" style="cursor:pointer;" onclick="filtrarPorProdutoEspecifico('Laptop')">
-        <div class="kpi-icon">🏆</div>
+        <div class="kpi-icon" id="iconKpiTop"></div>
         <div class="kpi-label">Maior Lucro</div>
         <div class="kpi-value" id="kpiProdMaisLucro">Laptop</div>
         <div class="kpi-sub" id="kpiProdMaisLucroSub">0 MT</div>
       </div>
       <div class="kpi-card yellow" style="cursor:pointer;" onclick="filtrarPorProdutoEspecifico('Webcam')">
-        <div class="kpi-icon">🔻</div>
+        <div class="kpi-icon" id="iconKpiWorst"></div>
         <div class="kpi-label">Menor Lucro</div>
         <div class="kpi-value" id="kpiProdMenosLucro">Webcam</div>
         <div class="kpi-sub" id="kpiProdMenosLucroSub">0 MT</div>
@@ -792,13 +925,16 @@
   <!-- ─── SEÇÃO DE RENTABILIDADE & LUCRO INTERATIVO ─── -->
   <section>
     <div class="section-title">
-      <span>💡 Rentabilidade por Produto (Interativo)</span>
-      <span class="interactive-hint">🖱️ Clique nas barras para filtrar por produto</span>
+      <span>Rentabilidade por Produto (Interativo)</span>
+      <span class="interactive-hint">
+        <span class="icon-slot" data-icon="mouse-pointer"></span>
+        Clique nas barras para isolar dados do produto
+      </span>
     </div>
     
     <div class="profit-banner">
       <div class="profit-box best" onclick="filtrarPorProdutoEspecifico('Laptop')">
-        <div class="profit-box-icon">🚀</div>
+        <div class="profit-box-icon" id="iconProfitBest"></div>
         <div>
           <div class="profit-box-title">Destaque de Rentabilidade: Laptop (Clique para filtrar)</div>
           <div class="profit-box-val" id="destaqueBest">310,500 MT de lucro</div>
@@ -806,7 +942,7 @@
         </div>
       </div>
       <div class="profit-box worst" onclick="filtrarPorProdutoEspecifico('Webcam')">
-        <div class="profit-box-icon">⚠️</div>
+        <div class="profit-box-icon" id="iconProfitWorst"></div>
         <div>
           <div class="profit-box-title">Menor Retorno Absoluto: Webcam (Clique para filtrar)</div>
           <div class="profit-box-val" id="destaqueWorst">57,400 MT de lucro</div>
@@ -824,7 +960,9 @@
         <div class="chart-controls">
           <button class="pill-btn active" id="btnLucroTodos" onclick="alternarVisaoRentabilidade('todos')">Todos</button>
           <button class="pill-btn" id="btnLucroTop5" onclick="alternarVisaoRentabilidade('top5')">Top 5</button>
-          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartLucroComparativo', 'rentabilidade_produtos.png')">📷</button>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartLucroComparativo', 'rentabilidade_produtos.png')">
+            <span class="icon-slot" data-icon="camera"></span>
+          </button>
         </div>
       </div>
       <div class="chart-wrap" style="height: 300px;"><canvas id="chartLucroComparativo"></canvas></div>
@@ -834,8 +972,11 @@
   <!-- ─── GRÁFICOS TEMPORAIS & CIDADE ─── -->
   <section>
     <div class="section-title">
-      <span>📅 Evolução Temporal & Geografia</span>
-      <span class="interactive-hint">🖱️ Clique nos meses ou cidades para isolar dados</span>
+      <span>Evolução Temporal & Geografia</span>
+      <span class="interactive-hint">
+        <span class="icon-slot" data-icon="mouse-pointer"></span>
+        Clique nos meses ou cidades para isolar dados
+      </span>
     </div>
     <div class="chart-grid">
       <div class="card">
@@ -845,7 +986,9 @@
             <button class="pill-btn active" id="btnMetricaReceita" onclick="alternarMetricaMes('receita')">Receita</button>
             <button class="pill-btn" id="btnMetricaLucro" onclick="alternarMetricaMes('lucro')">Lucro</button>
             <button class="pill-btn" id="btnMetricaQtd" onclick="alternarMetricaMes('qtd')">Qtd</button>
-            <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartMes', 'evolucao_temporal.png')">📷</button>
+            <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartMes', 'evolucao_temporal.png')">
+              <span class="icon-slot" data-icon="camera"></span>
+            </button>
           </div>
         </div>
         <div class="chart-wrap"><canvas id="chartMes"></canvas></div>
@@ -857,7 +1000,9 @@
           <div class="chart-controls">
             <button class="pill-btn active" id="btnCidadeReceita" onclick="alternarMetricaCidade('receita')">Receita</button>
             <button class="pill-btn" id="btnCidadeQtd" onclick="alternarMetricaCidade('qtd')">Qtd</button>
-            <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartCidade', 'distribuicao_cidades.png')">📷</button>
+            <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartCidade', 'distribuicao_cidades.png')">
+              <span class="icon-slot" data-icon="camera"></span>
+            </button>
           </div>
         </div>
         <div class="chart-wrap"><canvas id="chartCidade"></canvas></div>
@@ -868,14 +1013,19 @@
   <!-- ─── RANKINGS PRODUTOS ─── -->
   <section>
     <div class="section-title">
-      <span>🛒 Detalhamento de Produtos</span>
-      <span class="interactive-hint">🖱️ Clique para selecionar qualquer produto</span>
+      <span>Detalhamento de Produtos</span>
+      <span class="interactive-hint">
+        <span class="icon-slot" data-icon="mouse-pointer"></span>
+        Clique para selecionar qualquer produto
+      </span>
     </div>
     <div class="chart-grid-3">
       <div class="card">
         <div class="card-title">
           <div class="card-title-left"><span class="dot" style="background:var(--accent)"></span> Receita por Produto</div>
-          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartProdReceita', 'receita_produtos.png')">📷</button>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartProdReceita', 'receita_produtos.png')">
+            <span class="icon-slot" data-icon="camera"></span>
+          </button>
         </div>
         <div class="chart-wrap" style="height:270px"><canvas id="chartProdReceita"></canvas></div>
       </div>
@@ -883,7 +1033,9 @@
       <div class="card">
         <div class="card-title">
           <div class="card-title-left"><span class="dot" style="background:var(--accent2)"></span> Unidades Vendidas</div>
-          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartProdQtd', 'unidades_produtos.png')">📷</button>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartProdQtd', 'unidades_produtos.png')">
+            <span class="icon-slot" data-icon="camera"></span>
+          </button>
         </div>
         <div class="chart-wrap" style="height:270px"><canvas id="chartProdQtd"></canvas></div>
       </div>
@@ -891,7 +1043,9 @@
       <div class="card">
         <div class="card-title">
           <div class="card-title-left"><span class="dot" style="background:var(--accent3)"></span> Market Share (%)</div>
-          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartDoughnut', 'market_share.png')">📷</button>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartDoughnut', 'market_share.png')">
+            <span class="icon-slot" data-icon="camera"></span>
+          </button>
         </div>
         <div class="chart-wrap" style="height:270px"><canvas id="chartDoughnut"></canvas></div>
       </div>
@@ -901,8 +1055,11 @@
   <!-- ─── RANKINGS CLIENTES ─── -->
   <section>
     <div class="section-title">
-      <span>👥 Análise de Clientes</span>
-      <span class="interactive-hint">🖱️ Clique num cliente para ver apenas o histórico dele</span>
+      <span>Análise de Clientes</span>
+      <span class="interactive-hint">
+        <span class="icon-slot" data-icon="user"></span>
+        Clique num cliente para ver o histórico isolado
+      </span>
     </div>
     <div class="chart-grid">
       <div class="card">
@@ -922,10 +1079,15 @@
 
   <!-- ─── TABELA DE REGISTOS ─── -->
   <section>
-    <div class="section-title">📋 Base de Dados de Transações</div>
+    <div class="section-title">
+      <span>Base de Dados de Transações</span>
+    </div>
     <div class="card">
       <div class="search-wrap">
-        <input class="search-input" id="searchInput" type="text" placeholder="🔍 Pesquisar cliente, produto ou cidade..." />
+        <div class="search-input-box">
+          <span class="icon-slot" data-icon="search"></span>
+          <input class="search-input" id="searchInput" type="text" placeholder="Pesquisar cliente, produto ou cidade..." />
+        </div>
         <select class="filter-select" id="filterCidade">
           <option value="">Todas as Cidades</option>
           <option>Maputo</option>
@@ -960,7 +1122,10 @@
       </div>
       <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:0.84rem;">
         <span id="tableCount">Carregando...</span>
-        <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.78rem" onclick="restaurarDadosOriginais()">↺ Restaurar Padrão</button>
+        <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.78rem" onclick="restaurarDadosOriginais()">
+          <span class="icon-slot" data-icon="refresh-cw"></span>
+          <span>Restaurar Padrão</span>
+        </button>
       </div>
     </div>
   </section>
@@ -971,8 +1136,13 @@
 <div class="modal-overlay" id="modalVenda">
   <div class="modal-card">
     <div class="modal-header">
-      <h3>➕ Registar Nova Venda</h3>
-      <button class="modal-close" onclick="fecharModalVenda()">&times;</button>
+      <h3>
+        <span class="icon-slot" data-icon="plus" style="color:var(--accent)"></span>
+        Registar Nova Venda
+      </h3>
+      <button class="modal-close" onclick="fecharModalVenda()">
+        <span class="icon-slot" data-icon="x"></span>
+      </button>
     </div>
     <form id="formNovaVenda" onsubmit="salvarNovaVenda(event)">
       <div class="form-row">
@@ -1026,7 +1196,7 @@
 
 <!-- ─── TOAST NOTIFICATION ─── -->
 <div class="toast" id="toast">
-  <span id="toastIcon">✅</span>
+  <span id="toastIconSlot"></span>
   <span id="toastMsg">Operação realizada com sucesso!</span>
 </div>
 
@@ -1036,19 +1206,112 @@
 
 <script>
 // ────────────────────────────────────────────
+//  SISTEMA NATIVO DE ÍCONES PROFISSIONAIS (SVG)
+// ────────────────────────────────────────────
+const ICONS = {
+  'bar-chart': `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>`,
+  'wallet': `<svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`,
+  'trending-up': `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+  'package': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>`,
+  'trophy': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+  'arrow-down-right': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7v10H7"/></svg>`,
+  'rocket': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>`,
+  'alert-triangle': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`,
+  'download': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>`,
+  'plus': `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>`,
+  'sun': `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
+  'moon': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+  'search': `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>`,
+  'camera': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
+  'refresh-cw': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
+  'x': `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`,
+  'check': `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+  'filter': `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>`,
+  'info': `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`,
+  'mouse-pointer': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="m13 13 6 6"/></svg>`,
+  'user': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  'map-pin': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+
+  // Ícones de Produtos Profissionais
+  'laptop': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55A1 1 0 0 1 20.28 20H3.72a1 1 0 0 1-.9-1.45L4 16"/></svg>`,
+  'monitor': `<svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>`,
+  'tablet': `<svg class="svg-icon" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`,
+  'hard-drive': `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="22" x2="2" y1="12" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" x2="6.01" y1="16" y2="16"/><line x1="10" x2="10.01" y1="16" y2="16"/></svg>`,
+  'printer': `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>`,
+  'keyboard': `<svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M10 13h4"/></svg>`,
+  'armchair': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H7v-2a2 2 0 0 0-4 0Z"/><path d="M5 18v2M19 18v2"/></svg>`,
+  'headphones': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>`,
+  'mouse': `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="7"/><line x1="12" x2="12" y1="6" y2="10"/></svg>`,
+  'camera-prod': `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`
+};
+
+function renderIcon(nome, extraStyle = "") {
+  return ICONS[nome] || `<span style="${extraStyle}">📦</span>`;
+}
+
+function inicializarIconesEstaticos() {
+  document.querySelectorAll('.icon-slot').forEach(el => {
+    const nome = el.getAttribute('data-icon');
+    if (ICONS[nome]) el.innerHTML = ICONS[nome];
+  });
+
+  document.getElementById('logoIconContainer').innerHTML = renderIcon('bar-chart');
+  document.getElementById('iconKpiReceita').innerHTML = renderIcon('wallet');
+  document.getElementById('iconKpiLucro').innerHTML = renderIcon('trending-up');
+  document.getElementById('iconKpiQtd').innerHTML = renderIcon('package');
+  document.getElementById('iconKpiTop').innerHTML = renderIcon('trophy');
+  document.getElementById('iconKpiWorst').innerHTML = renderIcon('arrow-down-right');
+  document.getElementById('iconProfitBest').innerHTML = renderIcon('rocket');
+  document.getElementById('iconProfitWorst').innerHTML = renderIcon('alert-triangle');
+}
+
+// ────────────────────────────────────────────
+//  GESTÃO DE TEMA PRETO (DARK) / BRANCO (LIGHT)
+// ────────────────────────────────────────────
+let temaAtual = localStorage.getItem("muv_theme") || "dark";
+
+function aplicarTema(tema) {
+  temaAtual = tema;
+  document.documentElement.setAttribute('data-theme', tema);
+  localStorage.setItem("muv_theme", tema);
+
+  const iconEl = document.getElementById('themeIcon');
+  const labelEl = document.getElementById('themeLabel');
+
+  if (tema === 'light') {
+    iconEl.innerHTML = renderIcon('moon');
+    labelEl.textContent = 'Modo Escuro';
+  } else {
+    iconEl.innerHTML = renderIcon('sun');
+    labelEl.textContent = 'Modo Claro';
+  }
+
+  // Atualizar cores dos gráficos para combinar com o tema
+  if (typeof atualizarDashboard === 'function') {
+    atualizarDashboard();
+  }
+}
+
+function alternarTema() {
+  const novoTema = temaAtual === 'dark' ? 'light' : 'dark';
+  aplicarTema(novoTema);
+  mostrarToast(`Tema alterado para: ${novoTema === 'dark' ? 'Preto (Escuro)' : 'Branco (Claro)'}`, novoTema === 'dark' ? 'moon' : 'sun');
+}
+
+// ────────────────────────────────────────────
 //  CONFIGURAÇÃO DE PRODUTOS & CUSTOS
 // ────────────────────────────────────────────
 const PRODUTOS_CONFIG = {
-  "Laptop":        { preco: 45000, custo: 31500, emoji: "💻" },
-  "Monitor":       { preco: 15000, custo:  9800, emoji: "🖥️" },
-  "Tablet":        { preco: 28000, custo: 19500, emoji: "📱" },
-  "SSD Externo":   { preco:  8500, custo:  5500, emoji: "💾" },
-  "Impressora":    { preco: 12500, custo:  8200, emoji: "🖨️" },
-  "Teclado":       { preco:  1800, custo:  1100, emoji: "⌨️" },
-  "Cadeira Gamer": { preco: 18000, custo: 12000, emoji: "🪑" },
-  "Headphones":    { preco:  3500, custo:  2200, emoji: "🎧" },
-  "Rato":          { preco:   900, custo:   500, emoji: "🖱️" },
-  "Webcam":        { preco:  4200, custo:  2800, emoji: "📷" },
+  "Laptop":        { preco: 45000, custo: 31500, icon: 'laptop' },
+  "Monitor":       { preco: 15000, custo:  9800, icon: 'monitor' },
+  "Tablet":        { preco: 28000, custo: 19500, icon: 'tablet' },
+  "SSD Externo":   { preco:  8500, custo:  5500, icon: 'hard-drive' },
+  "Impressora":    { preco: 12500, custo:  8200, icon: 'printer' },
+  "Teclado":       { preco:  1800, custo:  1100, icon: 'keyboard' },
+  "Cadeira Gamer": { preco: 18000, custo: 12000, icon: 'armchair' },
+  "Headphones":    { preco:  3500, custo:  2200, icon: 'headphones' },
+  "Rato":          { preco:   900, custo:   500, icon: 'mouse' },
+  "Webcam":        { preco:  4200, custo:  2800, icon: 'camera-prod' },
 };
 
 const VENDAS_INICIAIS = [
@@ -1166,15 +1429,15 @@ try {
 //  ESTADO DE INTERATIVIDADE & FILTROS ATIVOS
 // ────────────────────────────────────────────
 let filtroInterativo = {
-  tipo: null,      // 'produto', 'cidade', 'mes', 'cliente'
-  valor: null,     // ex: 'Laptop', 'Maputo', '02', 'Ana Cossa'
-  rotulo: null     // ex: 'Laptop (Produto)', 'Maputo (Cidade)'
+  tipo: null,
+  valor: null,
+  rotulo: null
 };
 
 let configGraficos = {
-  metricaMes: 'receita',       // 'receita', 'lucro', 'qtd'
-  metricaCidade: 'receita',    // 'receita', 'qtd'
-  visaoRentabilidade: 'todos'  // 'todos', 'top5'
+  metricaMes: 'receita',
+  metricaCidade: 'receita',
+  visaoRentabilidade: 'todos'
 };
 
 const fmt  = n => Math.round(n).toLocaleString('pt-MZ') + ' MT';
@@ -1201,10 +1464,18 @@ const AVATAR_CORES = [
 
 let charts = {};
 
-// Helper cursor pointer no hover do Chart.js
 const onHoverPointer = (event, chartElement) => {
   event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
 };
+
+function getCoresTema() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  return {
+    tickColor: isLight ? '#64748b' : '#8b8fa8',
+    gridColor: isLight ? 'rgba(226,232,240,0.85)' : 'rgba(46,49,72,0.4)',
+    textColor: isLight ? '#0f172a' : '#e8eaf6'
+  };
+}
 
 // ────────────────────────────────────────────
 //  INICIALIZAÇÃO DE SELECTS
@@ -1218,7 +1489,7 @@ function initSelectProdutos() {
   Object.keys(PRODUTOS_CONFIG).forEach(p => {
     const optM = document.createElement('option');
     optM.value = p;
-    optM.textContent = `${PRODUTOS_CONFIG[p].emoji} ${p} (${fmt(PRODUTOS_CONFIG[p].preco)})`;
+    optM.textContent = `${p} (${fmt(PRODUTOS_CONFIG[p].preco)})`;
     selectModal.appendChild(optM);
 
     const optF = document.createElement('option');
@@ -1244,7 +1515,6 @@ function initSelectClientes() {
 //  ATUALIZAÇÃO GERAL DO DASHBOARD
 // ────────────────────────────────────────────
 function atualizarDashboard() {
-  // Aplicar filtro interativo (se houver) para calcular KPIs e métricas filtradas
   const dadosBase = filtroInterativo.tipo ? vendas.filter(v => {
     if (filtroInterativo.tipo === 'produto') return v.produto === filtroInterativo.valor;
     if (filtroInterativo.tipo === 'cidade') return v.cidade === filtroInterativo.valor;
@@ -1253,7 +1523,6 @@ function atualizarDashboard() {
     return true;
   }) : vendas;
 
-  // Atualizar barra de filtro
   const bar = document.getElementById('activeFilterBar');
   if (filtroInterativo.tipo) {
     bar.style.display = 'flex';
@@ -1263,7 +1532,6 @@ function atualizarDashboard() {
     bar.style.display = 'none';
   }
 
-  // 1. Cálculos de KPIs
   let receitaTotal = 0;
   let lucroTotal = 0;
   let unidadesTotal = 0;
@@ -1289,7 +1557,6 @@ function atualizarDashboard() {
     lucroTotal += lucro;
     unidadesTotal += v.quantidade;
 
-    // Agrupamento Produto
     if (!prodLucroMap[v.produto]) {
       prodLucroMap[v.produto] = 0;
       prodReceitaMap[v.produto] = 0;
@@ -1299,11 +1566,9 @@ function atualizarDashboard() {
     prodReceitaMap[v.produto] += v.valor;
     prodQtdMap[v.produto] += v.quantidade;
 
-    // Agrupamento Cidade
     cidadeReceitaMap[v.cidade] = (cidadeReceitaMap[v.cidade] || 0) + v.valor;
     cidadeQtdMap[v.cidade] = (cidadeQtdMap[v.cidade] || 0) + v.quantidade;
 
-    // Agrupamento Mês
     const mesNum = v.data.slice(5, 7);
     const mesNome = mesesMap[mesNum] || 'Outro';
     mesReceitaMap[mesNome] = (mesReceitaMap[mesNome] || 0) + v.valor;
@@ -1313,7 +1578,6 @@ function atualizarDashboard() {
 
   const margemGeral = receitaTotal > 0 ? (lucroTotal / receitaTotal * 100).toFixed(1) : 0;
 
-  // Atualizar cards de KPI
   document.getElementById('badgeTotalVendas').textContent = `${dadosBase.length} Vendas`;
   document.getElementById('kpiReceita').textContent = fmt(receitaTotal);
   document.getElementById('kpiLucro').textContent = fmt(lucroTotal);
@@ -1321,7 +1585,6 @@ function atualizarDashboard() {
   document.getElementById('kpiUnidades').textContent = fmtN(unidadesTotal);
   document.getElementById('kpiRegistos').textContent = `${dadosBase.length} transações`;
 
-  // Ranking de lucro
   const rankingLucro = Object.entries(prodLucroMap).sort((a,b) => b[1] - a[1]);
   if (rankingLucro.length > 0) {
     const best = rankingLucro[0];
@@ -1337,25 +1600,20 @@ function atualizarDashboard() {
     document.getElementById('destaqueWorst').textContent = `${fmt(worst[1])} de lucro (${fmt(prodReceitaMap[worst[0]])} de receita)`;
   }
 
-  // 2. Renderizar / Atualizar Gráficos Interativos
   renderGraficoLucroComparativo(prodReceitaMap, prodLucroMap);
   renderGraficoMes(mesReceitaMap, mesLucroMap, mesQtdMap);
   renderGraficoCidade(cidadeReceitaMap, cidadeQtdMap);
   renderGraficosProdutos(prodReceitaMap, prodQtdMap);
 
-  // 3. Rankings de Clientes
   renderRankingsClientes(dadosBase);
-
-  // 4. Tabela
   filtrarTabela();
 }
 
 // ────────────────────────────────────────────
-//  GRÁFICOS CHART.JS COM INTERATIVIDADE TOTAL
+//  GRÁFICOS CHART.JS ADAPTADOS AO TEMA
 // ────────────────────────────────────────────
-
-// 1. Gráfico de Rentabilidade (Receita vs Lucro)
 function renderGraficoLucroComparativo(receitas, lucros) {
+  const { tickColor, gridColor, textColor } = getCoresTema();
   let prods = Object.keys(receitas).sort((a, b) => receitas[b] - receitas[a]);
   if (configGraficos.visaoRentabilidade === 'top5') {
     prods = prods.slice(0, 5);
@@ -1394,36 +1652,35 @@ function renderGraficoLucroComparativo(receitas, lucros) {
       onClick: (e, elements) => {
         if (elements.length > 0) {
           const idx = elements[0].index;
-          const produto = prods[idx];
-          filtrarPorProdutoEspecifico(produto);
+          filtrarPorProdutoEspecifico(prods[idx]);
         }
       },
       plugins: {
         legend: {
           display: true,
           position: 'top',
-          labels: { color: '#e8eaf6', font: { size: 12 } }
+          labels: { color: textColor, font: { size: 12 } }
         },
         tooltip: {
           callbacks: {
             label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`,
-            afterBody: () => '👉 Clique na barra para filtrar por este produto'
+            afterBody: () => 'Clique na barra para filtrar por este produto'
           }
         }
       },
       scales: {
-        x: { ticks: { color: '#8b8fa8' }, grid: { display: false } },
+        x: { ticks: { color: tickColor }, grid: { display: false } },
         y: {
-          ticks: { color: '#8b8fa8', callback: v => (v/1000) + 'k' },
-          grid: { color: 'rgba(46,49,72,.4)' }
+          ticks: { color: tickColor, callback: v => (v/1000) + 'k' },
+          grid: { color: gridColor }
         }
       }
     }
   });
 }
 
-// 2. Gráfico de Evolução Temporal
 function renderGraficoMes(mesReceita, mesLucro, mesQtd) {
+  const { tickColor, gridColor } = getCoresTema();
   const ordem = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const mesesNum = {'Janeiro':'01','Fevereiro':'02','Março':'03','Abril':'04','Maio':'05','Junho':'06','Julho':'07','Agosto':'08','Setembro':'09','Outubro':'10','Novembro':'11','Dezembro':'12'};
   
@@ -1483,26 +1740,26 @@ function renderGraficoMes(mesReceita, mesLucro, mesQtd) {
         tooltip: {
           callbacks: {
             label: ctx => ` ${labelMetrica}: ${configGraficos.metricaMes === 'qtd' ? fmtN(ctx.parsed.y) + ' un.' : fmt(ctx.parsed.y)}`,
-            afterBody: () => '👉 Clique no ponto para filtrar por este mês'
+            afterBody: () => 'Clique no ponto para filtrar por este mês'
           }
         }
       },
       scales: {
-        x: { ticks: { color: '#8b8fa8' }, grid: { color: 'rgba(46,49,72,.4)' } },
+        x: { ticks: { color: tickColor }, grid: { color: gridColor } },
         y: {
           ticks: {
-            color: '#8b8fa8',
+            color: tickColor,
             callback: v => configGraficos.metricaMes === 'qtd' ? v : (v/1000)+'k'
           },
-          grid: { color: 'rgba(46,49,72,.4)' }
+          grid: { color: gridColor }
         }
       }
     }
   });
 }
 
-// 3. Gráfico de Cidades
 function renderGraficoCidade(cidadeReceita, cidadeQtd) {
+  const { textColor } = getCoresTema();
   const cidades = Object.keys(cidadeReceita);
   const isQtd = configGraficos.metricaCidade === 'qtd';
   const valores = cidades.map(c => isQtd ? cidadeQtd[c] : cidadeReceita[c]);
@@ -1518,7 +1775,7 @@ function renderGraficoCidade(cidadeReceita, cidadeQtd) {
         data: valores,
         backgroundColor: ['#6c63ff', '#00d4aa', '#ffd166', '#ff6b6b'],
         hoverBackgroundColor: ['#837bff', '#24e3bc', '#ffe08a', '#ff8585'],
-        borderColor: '#1a1d27',
+        borderColor: document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#1a1d27',
         borderWidth: 3,
         hoverOffset: 8
       }]
@@ -1539,7 +1796,7 @@ function renderGraficoCidade(cidadeReceita, cidadeQtd) {
         legend: {
           display: true,
           position: 'bottom',
-          labels: { color: '#e8eaf6', padding: 14, font: { size: 12 } }
+          labels: { color: textColor, padding: 14, font: { size: 12 } }
         },
         tooltip: {
           callbacks: {
@@ -1550,7 +1807,7 @@ function renderGraficoCidade(cidadeReceita, cidadeQtd) {
                 ? ` ${ctx.label}: ${fmtN(val)} un. (${pct}%)`
                 : ` ${ctx.label}: ${fmt(val)} (${pct}%)`;
             },
-            afterBody: () => '👉 Clique na fatia para filtrar por esta cidade'
+            afterBody: () => 'Clique na fatia para filtrar por esta cidade'
           }
         }
       }
@@ -1558,8 +1815,8 @@ function renderGraficoCidade(cidadeReceita, cidadeQtd) {
   });
 }
 
-// 4. Gráficos de Produtos (Receita, Quantidade, Doughnut Share)
 function renderGraficosProdutos(receitas, qtds) {
+  const { tickColor, gridColor, textColor } = getCoresTema();
   const sorted = Object.entries(receitas).sort((a,b) => b[1] - a[1]);
   const prods = sorted.map(s => s[0]);
   const recVals = sorted.map(s => s[1]);
@@ -1569,7 +1826,6 @@ function renderGraficosProdutos(receitas, qtds) {
   const prodsQtd = sortedQtd.map(s => s[0]);
   const qtdVals = sortedQtd.map(s => s[1]);
 
-  // A. Receita por produto (Bar horizontal)
   if (charts.prodRec) charts.prodRec.destroy();
   charts.prodRec = new Chart(document.getElementById('chartProdReceita'), {
     type: 'bar',
@@ -1579,7 +1835,6 @@ function renderGraficosProdutos(receitas, qtds) {
         label: 'Receita (MT)',
         data: recVals,
         backgroundColor: PALETA,
-        hoverBackgroundColor: PALETA.map(c => '#ffffff'),
         borderRadius: 5
       }]
     },
@@ -1590,8 +1845,7 @@ function renderGraficosProdutos(receitas, qtds) {
       onHover: onHoverPointer,
       onClick: (e, elements) => {
         if (elements.length > 0) {
-          const produto = prods[elements[0].index];
-          filtrarPorProdutoEspecifico(produto);
+          filtrarPorProdutoEspecifico(prods[elements[0].index]);
         }
       },
       plugins: {
@@ -1599,18 +1853,17 @@ function renderGraficosProdutos(receitas, qtds) {
         tooltip: {
           callbacks: {
             label: ctx => ` Receita: ${fmt(ctx.parsed.x)}`,
-            afterBody: () => '👉 Clique para filtrar por este produto'
+            afterBody: () => 'Clique para filtrar por este produto'
           }
         }
       },
       scales: {
-        x: { ticks: { color: '#8b8fa8', callback: v => (v/1000)+'k' }, grid: { color: 'rgba(46,49,72,.4)' } },
-        y: { ticks: { color: '#e8eaf6', font: { size: 11 } }, grid: { display: false } }
+        x: { ticks: { color: tickColor, callback: v => (v/1000)+'k' }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } }
       }
     }
   });
 
-  // B. Quantidade por produto (Bar vertical)
   if (charts.prodQtd) charts.prodQtd.destroy();
   charts.prodQtd = new Chart(document.getElementById('chartProdQtd'), {
     type: 'bar',
@@ -1629,8 +1882,7 @@ function renderGraficosProdutos(receitas, qtds) {
       onHover: onHoverPointer,
       onClick: (e, elements) => {
         if (elements.length > 0) {
-          const produto = prodsQtd[elements[0].index];
-          filtrarPorProdutoEspecifico(produto);
+          filtrarPorProdutoEspecifico(prodsQtd[elements[0].index]);
         }
       },
       plugins: {
@@ -1638,18 +1890,17 @@ function renderGraficosProdutos(receitas, qtds) {
         tooltip: {
           callbacks: {
             label: ctx => ` Qtd: ${fmtN(ctx.parsed.y)} unidades`,
-            afterBody: () => '👉 Clique para filtrar por este produto'
+            afterBody: () => 'Clique para filtrar por este produto'
           }
         }
       },
       scales: {
-        x: { ticks: { color: '#8b8fa8', font: { size: 10 }, maxRotation: 45 }, grid: { display: false } },
-        y: { ticks: { color: '#8b8fa8' }, grid: { color: 'rgba(46,49,72,.4)' } }
+        x: { ticks: { color: tickColor, font: { size: 10 }, maxRotation: 45 }, grid: { display: false } },
+        y: { ticks: { color: tickColor }, grid: { color: gridColor } }
       }
     }
   });
 
-  // C. Market Share Doughnut
   if (charts.doughnut) charts.doughnut.destroy();
   charts.doughnut = new Chart(document.getElementById('chartDoughnut'), {
     type: 'pie',
@@ -1658,7 +1909,7 @@ function renderGraficosProdutos(receitas, qtds) {
       datasets: [{
         data: recVals,
         backgroundColor: PALETA,
-        borderColor: '#1a1d27',
+        borderColor: document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#1a1d27',
         borderWidth: 2,
         hoverOffset: 6
       }]
@@ -1669,12 +1920,11 @@ function renderGraficosProdutos(receitas, qtds) {
       onHover: onHoverPointer,
       onClick: (e, elements) => {
         if (elements.length > 0) {
-          const produto = prods[elements[0].index];
-          filtrarPorProdutoEspecifico(produto);
+          filtrarPorProdutoEspecifico(prods[elements[0].index]);
         }
       },
       plugins: {
-        legend: { display: true, position: 'bottom', labels: { color: '#8b8fa8', padding: 6, font: { size: 9.5 } } },
+        legend: { display: true, position: 'bottom', labels: { color: textColor, padding: 6, font: { size: 9.5 } } },
         tooltip: {
           callbacks: {
             label: ctx => {
@@ -1682,7 +1932,7 @@ function renderGraficosProdutos(receitas, qtds) {
               const pct = totalRec > 0 ? ((val / totalRec) * 100).toFixed(1) : 0;
               return ` ${ctx.label}: ${pct}% (${fmt(val)})`;
             },
-            afterBody: () => '👉 Clique para filtrar por este produto'
+            afterBody: () => 'Clique para filtrar por este produto'
           }
         }
       }
@@ -1691,7 +1941,7 @@ function renderGraficosProdutos(receitas, qtds) {
 }
 
 // ────────────────────────────────────────────
-//  CONTROLES DE VISÃO INTERATIVA DOS GRÁFICOS
+//  CONTROLES DE VISÃO INTERATIVA
 // ────────────────────────────────────────────
 function alternarVisaoRentabilidade(visao) {
   configGraficos.visaoRentabilidade = visao;
@@ -1721,13 +1971,12 @@ function alternarMetricaCidade(metrica) {
 function ativarFiltroInterativo(tipo, valor, rotulo) {
   filtroInterativo = { tipo, valor, rotulo };
   
-  // Atualizar selects de controle caso corresponda
   if (tipo === 'produto') document.getElementById('filterProduto').value = valor;
   if (tipo === 'cidade') document.getElementById('filterCidade').value = valor;
   if (tipo === 'cliente') document.getElementById('filterCliente').value = valor;
 
   atualizarDashboard();
-  mostrarToast(`Filtrado por: ${rotulo}`, "🎯");
+  mostrarToast(`Filtrado por: ${rotulo}`, "filter");
 }
 
 function filtrarPorProdutoEspecifico(prod) {
@@ -1745,7 +1994,7 @@ function limparFiltroInterativo() {
   document.getElementById('filterCliente').value = '';
   document.getElementById('searchInput').value = '';
   atualizarDashboard();
-  mostrarToast("Filtros do gráfico removidos!", "↺");
+  mostrarToast("Filtros do gráfico removidos!", "refresh-cw");
 }
 
 // ────────────────────────────────────────────
@@ -1758,7 +2007,7 @@ function baixarGraficoPNG(canvasId, nomeArquivo) {
   link.download = nomeArquivo;
   link.href = canvas.toDataURL('image/png', 1.0);
   link.click();
-  mostrarToast(`Gráfico exportado como imagem PNG!`, "📷");
+  mostrarToast(`Gráfico exportado como imagem PNG!`, "camera");
 }
 
 // ────────────────────────────────────────────
@@ -1829,15 +2078,23 @@ function renderTabela(dados) {
   tbody.innerHTML = '';
 
   dados.forEach((v, i) => {
-    const cfg = PRODUTOS_CONFIG[v.produto] || { emoji: '📦' };
+    const cfg = PRODUTOS_CONFIG[v.produto] || { icon: 'package' };
     const { lucro } = calcularMetricasVenda(v);
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="color:var(--muted);font-size:.8rem">${i + 1}</td>
       <td>${v.data}</td>
       <td><strong style="cursor:pointer;" onclick="filtrarPorClienteEspecifico('${v.cliente}')" title="Filtrar por este cliente">${v.cliente}</strong></td>
-      <td><span class="produto-badge" style="background:rgba(108,99,255,.1);color:#a78bfa" onclick="filtrarPorProdutoEspecifico('${v.produto}')" title="Filtrar por este produto">${cfg.emoji} ${v.produto}</span></td>
-      <td><span class="cidade-tag ${cidadeClass(v.cidade)}" onclick="ativarFiltroInterativo('cidade', '${v.cidade}', 'Cidade: ${v.cidade}')" title="Filtrar por esta cidade">${v.cidade}</span></td>
+      <td>
+        <span class="produto-badge" style="background:rgba(108,99,255,.12);color:var(--accent)" onclick="filtrarPorProdutoEspecifico('${v.produto}')" title="Filtrar por este produto">
+          ${renderIcon(cfg.icon)} ${v.produto}
+        </span>
+      </td>
+      <td>
+        <span class="cidade-tag ${cidadeClass(v.cidade)}" onclick="ativarFiltroInterativo('cidade', '${v.cidade}', 'Cidade: ${v.cidade}')" title="Filtrar por esta cidade">
+          ${renderIcon('map-pin')} ${v.cidade}
+        </span>
+      </td>
       <td style="text-align:center">${v.quantidade}</td>
       <td style="color:var(--muted)">${fmtN(v.preco)} MT</td>
       <td class="valor">${fmtN(v.valor)} MT</td>
@@ -1955,7 +2212,7 @@ async function salvarNovaVenda(e) {
   fecharModalVenda();
   initSelectClientes();
   atualizarDashboard();
-  mostrarToast(`Venda de ${novaVenda.produto} registada com sucesso!`);
+  mostrarToast(`Venda de ${novaVenda.produto} registada com sucesso!`, 'check');
 }
 
 function restaurarDadosOriginais() {
@@ -1965,7 +2222,7 @@ function restaurarDadosOriginais() {
     limparFiltroInterativo();
     initSelectClientes();
     atualizarDashboard();
-    mostrarToast("Dados restaurados para o padrão de 100 vendas!");
+    mostrarToast("Dados restaurados para o padrão de 100 vendas!", 'refresh-cw');
   }
 }
 
@@ -1999,23 +2256,25 @@ function exportarCSV() {
   link.click();
   document.body.removeChild(link);
 
-  mostrarToast("Ficheiro CSV gerado e descarregado com sucesso!");
+  mostrarToast("Ficheiro CSV gerado e descarregado com sucesso!", "download");
 }
 
 // ────────────────────────────────────────────
 //  TOAST DE NOTIFICAÇÃO
 // ────────────────────────────────────────────
-function mostrarToast(mensagem, icone = "✅") {
+function mostrarToast(mensagem, iconNome = "check") {
   const toast = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = mensagem;
-  document.getElementById('toastIcon').textContent = icone;
+  document.getElementById('toastIconSlot').innerHTML = renderIcon(iconNome);
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
 // ────────────────────────────────────────────
-//  INICIALIZAÇÃO
+//  INICIALIZAÇÃO GERAL
 // ────────────────────────────────────────────
+inicializarIconesEstaticos();
+aplicarTema(temaAtual);
 initSelectProdutos();
 initSelectClientes();
 atualizarDashboard();
