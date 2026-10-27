@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MUV Documents — Dashboard de Vendas e Rentabilidade Interativo</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #222536;
+      --surface3:  #2a2e45;
+      --border:    #2e3148;
+      --accent:    #6c63ff;
+      --accent-hover: #584ef0;
+      --accent2:   #00d4aa;
+      --accent3:   #ff6b6b;
+      --accent4:   #ffd166;
+      --text:      #e8eaf6;
+      --muted:     #8b8fa8;
+      --radius:    14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #12142a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(108,99,255,.3);
+    }
+
+    .logo h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.5px; }
+    .logo span { font-size: 0.8rem; color: var(--muted); display: block; margin-top: 1px; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all .2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 20px rgba(108,99,255,.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: var(--surface3);
+      border-color: var(--accent);
+    }
+
+    .badge {
+      background: rgba(108,99,255,.15);
+      border: 1px solid rgba(108,99,255,.3);
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    /* ── BARRA DE FILTRO ATIVO (INTERATIVO) ── */
+    .active-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, rgba(108,99,255,.2), rgba(0,212,170,.15));
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin-bottom: 24px;
+      animation: fadeIn .3s ease;
+    }
+
+    .active-filter-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.92rem;
+    }
+
+    .active-filter-text strong {
+      color: var(--accent2);
+    }
+
+    .btn-clear-filter {
+      background: rgba(255,107,107,.2);
+      border: 1px solid var(--accent3);
+      color: #ff9e9e;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-clear-filter:hover {
+      background: var(--accent3);
+      color: #fff;
+    }
+
+    /* ── LAYOUT ── */
+    main { padding: 30px 40px; max-width: 1450px; margin: 0 auto; }
+
+    section { margin-bottom: 36px; }
+
+    .section-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .interactive-hint {
+      font-size: 0.76rem;
+      color: var(--accent2);
+      background: rgba(0,212,170,.1);
+      padding: 3px 10px;
+      border-radius: 12px;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 500;
+    }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0,0,0,.35);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .kpi-card.purple::before { background: linear-gradient(90deg, var(--accent), #9c88ff); }
+    .kpi-card.green::before  { background: linear-gradient(90deg, var(--accent2), #00f0c0); }
+    .kpi-card.red::before    { background: linear-gradient(90deg, var(--accent3), #ff8e53); }
+    .kpi-card.yellow::before { background: linear-gradient(90deg, var(--accent4), #ffb347); }
+    .kpi-card.cyan::before   { background: linear-gradient(90deg, #22d3ee, #0284c7); }
+
+    .kpi-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-card.purple .kpi-icon { background: rgba(108,99,255,.15); }
+    .kpi-card.green  .kpi-icon { background: rgba(0,212,170,.15); }
+    .kpi-card.red    .kpi-icon { background: rgba(255,107,107,.15); }
+    .kpi-card.yellow .kpi-icon { background: rgba(255,209,102,.15); }
+    .kpi-card.cyan   .kpi-icon { background: rgba(34,211,238,.15); }
+
+    .kpi-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    .kpi-value { font-size: 1.65rem; font-weight: 700; line-height: 1.1; }
+    .kpi-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── CARDS & GRÁFICOS INTERATIVOS ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .chart-grid-3 {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr 0.85fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: box-shadow .2s;
+    }
+
+    .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.25); }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .card-title-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* Controles interativos dentro dos títulos dos gráficos */
+    .chart-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .pill-btn:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+    .pill-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-icon-chart {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all .2s;
+    }
+    .btn-icon-chart:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      transform: scale(1.08);
+    }
+
+    .chart-wrap { position: relative; height: 260px; }
+
+    /* ── HIGHLIGHT BOXES (RENTABILIDADE) ── */
+    .profit-banner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .profit-box {
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: transform .2s, border-color .2s;
+    }
+    .profit-box:hover {
+      transform: translateY(-2px);
+    }
+
+    .profit-box.best {
+      background: rgba(0,212,170,.08);
+      border: 1px solid rgba(0,212,170,.25);
+    }
+    .profit-box.best:hover {
+      border-color: var(--accent2);
+    }
+
+    .profit-box.worst {
+      background: rgba(255,107,107,.08);
+      border: 1px solid rgba(255,107,107,.25);
+    }
+    .profit-box.worst:hover {
+      border-color: var(--accent3);
+    }
+
+    .profit-box-icon { font-size: 32px; }
+
+    .profit-box-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+    }
+
+    .profit-box.best .profit-box-title { color: var(--accent2); }
+    .profit-box.worst .profit-box-title { color: var(--accent3); }
+
+    .profit-box-val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .profit-box-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── TABELA ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    thead th {
+      background: var(--surface2);
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(46,49,72,.45);
+      transition: background .15s;
+    }
+
+    tbody tr:hover { background: rgba(108,99,255,.07); }
+
+    tbody td {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+
+    .produto-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .produto-badge:hover { opacity: 0.85; }
+
+    .cidade-tag {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .cidade-tag:hover { opacity: 0.85; }
+
+    .cidade-maputo  { background: rgba(108,99,255,.15); color: #9c88ff; }
+    .cidade-matola  { background: rgba(0,212,170,.15);  color: var(--accent2); }
+    .cidade-boane   { background: rgba(255,209,102,.15);color: var(--accent4); }
+
+    .valor { font-weight: 700; color: var(--accent2); }
+
+    /* ── CLIENTES ── */
+    .cliente-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .cliente-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      transition: all .15s;
+      cursor: pointer;
+    }
+
+    .cliente-row:hover {
+      transform: translateX(4px);
+      border-color: var(--accent);
+      background: var(--surface3);
+    }
+
+    .cliente-rank {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb300); color: #000; }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); color: #000; }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); color: #fff; }
+    .rank-n { background: var(--border); color: var(--muted); }
+
+    .cliente-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.88rem;
+      flex-shrink: 0;
+    }
+
+    .cliente-info { flex: 1; }
+    .cliente-nome { font-weight: 600; font-size: 0.9rem; }
+    .cliente-valor { font-weight: 700; color: var(--accent2); font-size: 0.9rem; }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+    /* ── SEARCH & FILTERS ── */
+    .search-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      flex: 2;
+      min-width: 220px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
+
+    .filter-select {
+      flex: 1;
+      min-width: 140px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      transform: translateY(20px);
+      transition: transform .25s ease;
+    }
+
+    .modal-overlay.active .modal-card { transform: translateY(0); }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .form-control:focus { border-color: var(--accent); }
+
+    .modal-total-preview {
+      background: var(--surface2);
+      border: 1px solid rgba(0,212,170,.3);
+      padding: 14px;
+      border-radius: 10px;
+      margin-top: 10px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-total-preview span { font-size: 0.85rem; color: var(--muted); }
+    .modal-total-preview strong { font-size: 1.25rem; color: var(--accent2); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+      margin-top: 50px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .chart-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      main { padding: 20px 16px; }
+      header { padding: 16px 20px; flex-direction: column; gap: 14px; align-items: flex-start; }
+      .header-actions { width: 100%; justify-content: space-between; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .chart-grid, .profit-banner { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    <div>
+      <h1>MUV Documents</h1>
+      <span>Sistema de Gestão & Rentabilidade de Vendas</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="badge" id="badgeTotalVendas">100 Vendas</span>
+    <button class="btn btn-secondary" onclick="exportarCSV()">
+      📥 Exportar CSV
+    </button>
+    <button class="btn btn-primary" onclick="abrirModalVenda()">
+      ➕ Nova Venda
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ─── BARRA DE FILTRO INTERATIVO ATIVO (QUANDO CLICADO NUM GRÁFICO) ─── -->
+  <div class="active-filter-bar" id="activeFilterBar" style="display:none;">
+    <div class="active-filter-text">
+      <span>🎯 Filtro Interativo Ativo:</span>
+      <strong id="activeFilterDesc"></strong>
+    </div>
+    <button class="btn-clear-filter" onclick="limparFiltroInterativo()">✖ Limpar Filtro do Gráfico</button>
+  </div>
+
+  <!-- ─── KPI CARDS ─── -->
+  <section>
+    <div class="section-title">
+      <span>📈 Resumo Financeiro & Operacional</span>
+      <span class="interactive-hint">💡 Dica: Clique nos gráficos para filtrar todo o painel</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card purple">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Receita Bruta</div>
+        <div class="kpi-value" id="kpiReceita">0 MT</div>
+        <div class="kpi-sub">Total faturado</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-label">Lucro Estimado</div>
+        <div class="kpi-value" id="kpiLucro">0 MT</div>
+        <div class="kpi-sub" id="kpiMargem">Margem média: 0%</div>
+      </div>
+      <div class="kpi-card cyan">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-label">Unidades Vendidas</div>
+        <div class="kpi-value" id="kpiUnidades">0</div>
+        <div class="kpi-sub" id="kpiRegistos">0 transações</div>
+      </div>
+      <div class="kpi-card red" style="cursor:pointer;" onclick="filtrarPorProdutoEspecifico('Laptop')">
+        <div class="kpi-icon">🏆</div>
+        <div class="kpi-label">Maior Lucro</div>
+        <div class="kpi-value" id="kpiProdMaisLucro">Laptop</div>
+        <div class="kpi-sub" id="kpiProdMaisLucroSub">0 MT</div>
+      </div>
+      <div class="kpi-card yellow" style="cursor:pointer;" onclick="filtrarPorProdutoEspecifico('Webcam')">
+        <div class="kpi-icon">🔻</div>
+        <div class="kpi-label">Menor Lucro</div>
+        <div class="kpi-value" id="kpiProdMenosLucro">Webcam</div>
+        <div class="kpi-sub" id="kpiProdMenosLucroSub">0 MT</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO DE RENTABILIDADE & LUCRO INTERATIVO ─── -->
+  <section>
+    <div class="section-title">
+      <span>💡 Rentabilidade por Produto (Interativo)</span>
+      <span class="interactive-hint">🖱️ Clique nas barras para filtrar por produto</span>
+    </div>
+    
+    <div class="profit-banner">
+      <div class="profit-box best" onclick="filtrarPorProdutoEspecifico('Laptop')">
+        <div class="profit-box-icon">🚀</div>
+        <div>
+          <div class="profit-box-title">Destaque de Rentabilidade: Laptop (Clique para filtrar)</div>
+          <div class="profit-box-val" id="destaqueBest">310,500 MT de lucro</div>
+          <div class="profit-box-desc">Maior margem e maior retorno financeiro por unidade (45.000 MT / un).</div>
+        </div>
+      </div>
+      <div class="profit-box worst" onclick="filtrarPorProdutoEspecifico('Webcam')">
+        <div class="profit-box-icon">⚠️</div>
+        <div>
+          <div class="profit-box-title">Menor Retorno Absoluto: Webcam (Clique para filtrar)</div>
+          <div class="profit-box-val" id="destaqueWorst">57,400 MT de lucro</div>
+          <div class="profit-box-desc">Produto de menor receita global (172.200 MT) e menor lucro total no catálogo.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-left">
+          <span class="dot" style="background:var(--accent2)"></span>
+          Comparativo de Rentabilidade: Receita Bruta vs Lucro Líquido Estimado
+        </div>
+        <div class="chart-controls">
+          <button class="pill-btn active" id="btnLucroTodos" onclick="alternarVisaoRentabilidade('todos')">Todos</button>
+          <button class="pill-btn" id="btnLucroTop5" onclick="alternarVisaoRentabilidade('top5')">Top 5</button>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartLucroComparativo', 'rentabilidade_produtos.png')">📷</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height: 300px;"><canvas id="chartLucroComparativo"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ─── GRÁFICOS TEMPORAIS & CIDADE ─── -->
+  <section>
+    <div class="section-title">
+      <span>📅 Evolução Temporal & Geografia</span>
+      <span class="interactive-hint">🖱️ Clique nos meses ou cidades para isolar dados</span>
+    </div>
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot"></span> Evolução Temporal</div>
+          <div class="chart-controls">
+            <button class="pill-btn active" id="btnMetricaReceita" onclick="alternarMetricaMes('receita')">Receita</button>
+            <button class="pill-btn" id="btnMetricaLucro" onclick="alternarMetricaMes('lucro')">Lucro</button>
+            <button class="pill-btn" id="btnMetricaQtd" onclick="alternarMetricaMes('qtd')">Qtd</button>
+            <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartMes', 'evolucao_temporal.png')">📷</button>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartMes"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot" style="background:var(--accent4)"></span> Distribuição por Cidade</div>
+          <div class="chart-controls">
+            <button class="pill-btn active" id="btnCidadeReceita" onclick="alternarMetricaCidade('receita')">Receita</button>
+            <button class="pill-btn" id="btnCidadeQtd" onclick="alternarMetricaCidade('qtd')">Qtd</button>
+            <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartCidade', 'distribuicao_cidades.png')">📷</button>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCidade"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── RANKINGS PRODUTOS ─── -->
+  <section>
+    <div class="section-title">
+      <span>🛒 Detalhamento de Produtos</span>
+      <span class="interactive-hint">🖱️ Clique para selecionar qualquer produto</span>
+    </div>
+    <div class="chart-grid-3">
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot" style="background:var(--accent)"></span> Receita por Produto</div>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartProdReceita', 'receita_produtos.png')">📷</button>
+        </div>
+        <div class="chart-wrap" style="height:270px"><canvas id="chartProdReceita"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot" style="background:var(--accent2)"></span> Unidades Vendidas</div>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartProdQtd', 'unidades_produtos.png')">📷</button>
+        </div>
+        <div class="chart-wrap" style="height:270px"><canvas id="chartProdQtd"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot" style="background:var(--accent3)"></span> Market Share (%)</div>
+          <button class="btn-icon-chart" title="Descarregar gráfico em PNG" onclick="baixarGraficoPNG('chartDoughnut', 'market_share.png')">📷</button>
+        </div>
+        <div class="chart-wrap" style="height:270px"><canvas id="chartDoughnut"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── RANKINGS CLIENTES ─── -->
+  <section>
+    <div class="section-title">
+      <span>👥 Análise de Clientes</span>
+      <span class="interactive-hint">🖱️ Clique num cliente para ver apenas o histórico dele</span>
+    </div>
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot" style="background:var(--accent2)"></span> Top Clientes por Valor Gasto (MT)</div>
+        </div>
+        <div class="cliente-list" id="clientesPorValor"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-left"><span class="dot" style="background:var(--accent4)"></span> Top Clientes por Unidades Compradas</div>
+        </div>
+        <div class="cliente-list" id="clientesPorQtd"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TABELA DE REGISTOS ─── -->
+  <section>
+    <div class="section-title">📋 Base de Dados de Transações</div>
+    <div class="card">
+      <div class="search-wrap">
+        <input class="search-input" id="searchInput" type="text" placeholder="🔍 Pesquisar cliente, produto ou cidade..." />
+        <select class="filter-select" id="filterCidade">
+          <option value="">Todas as Cidades</option>
+          <option>Maputo</option>
+          <option>Matola</option>
+          <option>Boane</option>
+        </select>
+        <select class="filter-select" id="filterProduto">
+          <option value="">Todos os Produtos</option>
+        </select>
+        <select class="filter-select" id="filterCliente">
+          <option value="">Todos os Clientes</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Cidade</th>
+              <th style="text-align:center">Qtd</th>
+              <th>Preço Unit.</th>
+              <th>Valor Total</th>
+              <th>Lucro Estimado</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:0.84rem;">
+        <span id="tableCount">Carregando...</span>
+        <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.78rem" onclick="restaurarDadosOriginais()">↺ Restaurar Padrão</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── MODAL DE NOVA VENDA ─── -->
+<div class="modal-overlay" id="modalVenda">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>➕ Registar Nova Venda</h3>
+      <button class="modal-close" onclick="fecharModalVenda()">&times;</button>
+    </div>
+    <form id="formNovaVenda" onsubmit="salvarNovaVenda(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data da Venda</label>
+          <input type="date" class="form-control" id="vendaData" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cidade</label>
+          <select class="form-control" id="vendaCidade" required>
+            <option value="Maputo">Maputo</option>
+            <option value="Matola">Matola</option>
+            <option value="Boane">Boane</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nome do Cliente</label>
+        <input type="text" class="form-control" id="vendaCliente" placeholder="Ex: Ana Cossa, João Sitoe..." required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Produto</label>
+        <select class="form-control" id="vendaProduto" onchange="atualizarPrecoSugerido()" required></select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantidade</label>
+          <input type="number" class="form-control" id="vendaQtd" min="1" value="1" oninput="calcularTotalModal()" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preço Unitário (MT)</label>
+          <input type="number" class="form-control" id="vendaPreco" min="1" oninput="calcularTotalModal()" required />
+        </div>
+      </div>
+
+      <div class="modal-total-preview">
+        <span>Total da Transação:</span>
+        <strong id="modalTotalLabel">0 MT</strong>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="fecharModalVenda()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Venda</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ─── TOAST NOTIFICATION ─── -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg">Operação realizada com sucesso!</span>
+</div>
+
+<footer>
+  © 2026 MUV Documents · Dashboard Interativo de Vendas & Rentabilidade · Maputo, Moçambique
+</footer>
+
+<script>
+// ────────────────────────────────────────────
+//  CONFIGURAÇÃO DE PRODUTOS & CUSTOS
+// ────────────────────────────────────────────
+const PRODUTOS_CONFIG = {
+  "Laptop":        { preco: 45000, custo: 31500, emoji: "💻" },
+  "Monitor":       { preco: 15000, custo:  9800, emoji: "🖥️" },
+  "Tablet":        { preco: 28000, custo: 19500, emoji: "📱" },
+  "SSD Externo":   { preco:  8500, custo:  5500, emoji: "💾" },
+  "Impressora":    { preco: 12500, custo:  8200, emoji: "🖨️" },
+  "Teclado":       { preco:  1800, custo:  1100, emoji: "⌨️" },
+  "Cadeira Gamer": { preco: 18000, custo: 12000, emoji: "🪑" },
+  "Headphones":    { preco:  3500, custo:  2200, emoji: "🎧" },
+  "Rato":          { preco:   900, custo:   500, emoji: "🖱️" },
+  "Webcam":        { preco:  4200, custo:  2800, emoji: "📷" },
+};
+
+const VENDAS_INICIAIS = [
+  {data:"2026-01-03",cliente:"Carlos Machava",produto:"Headphones",cidade:"Maputo",quantidade:3,preco:3500,valor:10500},
+  {data:"2026-01-05",cliente:"Ana Cossa",produto:"Laptop",cidade:"Maputo",quantidade:2,preco:45000,valor:90000},
+  {data:"2026-01-08",cliente:"João Sitoe",produto:"Monitor",cidade:"Matola",quantidade:3,preco:15000,valor:45000},
+  {data:"2026-01-12",cliente:"Beatriz Langa",produto:"Teclado",cidade:"Maputo",quantidade:8,preco:1800,valor:14400},
+  {data:"2026-01-15",cliente:"Pedro Nhantumbo",produto:"Tablet",cidade:"Boane",quantidade:1,preco:28000,valor:28000},
+  {data:"2026-01-18",cliente:"Fátima Cumbe",produto:"Rato",cidade:"Boane",quantidade:10,preco:900,valor:9000},
+  {data:"2026-01-22",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Matola",quantidade:2,preco:8500,valor:17000},
+  {data:"2026-01-25",cliente:"Ana Cossa",produto:"Laptop",cidade:"Matola",quantidade:1,preco:45000,valor:45000},
+  {data:"2026-01-29",cliente:"Sofia Guambe",produto:"Cadeira Gamer",cidade:"Maputo",quantidade:1,preco:18000,valor:18000},
+  {data:"2026-02-03",cliente:"Carlos Machava",produto:"Monitor",cidade:"Maputo",quantidade:4,preco:15000,valor:60000},
+  {data:"2026-02-06",cliente:"João Sitoe",produto:"Headphones",cidade:"Matola",quantidade:4,preco:3500,valor:14000},
+  {data:"2026-02-09",cliente:"Fátima Cumbe",produto:"Teclado",cidade:"Boane",quantidade:12,preco:1800,valor:21600},
+  {data:"2026-02-12",cliente:"Rui Tembe",produto:"Tablet",cidade:"Maputo",quantidade:2,preco:28000,valor:56000},
+  {data:"2026-02-14",cliente:"Beatriz Langa",produto:"Rato",cidade:"Matola",quantidade:15,preco:900,valor:13500},
+  {data:"2026-02-18",cliente:"Pedro Nhantumbo",produto:"SSD Externo",cidade:"Boane",quantidade:3,preco:8500,valor:25500},
+  {data:"2026-02-20",cliente:"Luciana Bila",produto:"Impressora",cidade:"Maputo",quantidade:2,preco:12500,valor:25000},
+  {data:"2026-02-25",cliente:"Manuel Chaúque",produto:"Cadeira Gamer",cidade:"Matola",quantidade:1,preco:18000,valor:18000},
+  {data:"2026-02-27",cliente:"Ana Cossa",produto:"Laptop",cidade:"Boane",quantidade:2,preco:45000,valor:90000},
+  {data:"2026-03-02",cliente:"Carlos Machava",produto:"Headphones",cidade:"Boane",quantidade:6,preco:3500,valor:21000},
+  {data:"2026-03-04",cliente:"João Sitoe",produto:"Monitor",cidade:"Matola",quantidade:5,preco:15000,valor:75000},
+  {data:"2026-03-08",cliente:"Rui Tembe",produto:"Tablet",cidade:"Matola",quantidade:1,preco:28000,valor:28000},
+  {data:"2026-03-10",cliente:"Sofia Guambe",produto:"Teclado",cidade:"Maputo",quantidade:10,preco:1800,valor:18000},
+  {data:"2026-03-14",cliente:"Beatriz Langa",produto:"SSD Externo",cidade:"Maputo",quantidade:4,preco:8500,valor:34000},
+  {data:"2026-03-16",cliente:"Fátima Cumbe",produto:"Rato",cidade:"Boane",quantidade:20,preco:900,valor:18000},
+  {data:"2026-03-20",cliente:"Pedro Nhantumbo",produto:"Cadeira Gamer",cidade:"Boane",quantidade:2,preco:18000,valor:36000},
+  {data:"2026-03-22",cliente:"Luciana Bila",produto:"Impressora",cidade:"Matola",quantidade:3,preco:12500,valor:37500},
+  {data:"2026-03-26",cliente:"Carlos Machava",produto:"Webcam",cidade:"Maputo",quantidade:3,preco:4200,valor:12600},
+  {data:"2026-03-29",cliente:"Ana Cossa",produto:"Laptop",cidade:"Maputo",quantidade:3,preco:45000,valor:135000},
+  {data:"2026-04-01",cliente:"Rui Tembe",produto:"Headphones",cidade:"Maputo",quantidade:9,preco:3500,valor:31500},
+  {data:"2026-04-06",cliente:"João Sitoe",produto:"Monitor",cidade:"Boane",quantidade:4,preco:15000,valor:60000},
+  {data:"2026-04-08",cliente:"Sofia Guambe",produto:"Tablet",cidade:"Boane",quantidade:3,preco:28000,valor:84000},
+  {data:"2026-04-11",cliente:"Beatriz Langa",produto:"Teclado",cidade:"Matola",quantidade:15,preco:1800,valor:27000},
+  {data:"2026-04-14",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Matola",quantidade:5,preco:8500,valor:42500},
+  {data:"2026-04-17",cliente:"Fátima Cumbe",produto:"Rato",cidade:"Maputo",quantidade:18,preco:900,valor:16200},
+  {data:"2026-04-20",cliente:"Carlos Machava",produto:"Cadeira Gamer",cidade:"Maputo",quantidade:2,preco:18000,valor:36000},
+  {data:"2026-04-23",cliente:"Luciana Bila",produto:"Impressora",cidade:"Boane",quantidade:2,preco:12500,valor:25000},
+  {data:"2026-04-26",cliente:"Pedro Nhantumbo",produto:"Webcam",cidade:"Boane",quantidade:4,preco:4200,valor:16800},
+  {data:"2026-04-28",cliente:"Ana Cossa",produto:"Laptop",cidade:"Matola",quantidade:2,preco:45000,valor:90000},
+  {data:"2026-05-02",cliente:"Rui Tembe",produto:"Headphones",cidade:"Maputo",quantidade:5,preco:3500,valor:17500},
+  {data:"2026-05-04",cliente:"João Sitoe",produto:"Monitor",cidade:"Boane",quantidade:4,preco:15000,valor:60000},
+  {data:"2026-05-07",cliente:"Manuel Chaúque",produto:"Impressora",cidade:"Matola",quantidade:4,preco:12500,valor:50000},
+  {data:"2026-05-10",cliente:"Sofia Guambe",produto:"Webcam",cidade:"Boane",quantidade:3,preco:4200,valor:12600},
+  {data:"2026-05-12",cliente:"Beatriz Langa",produto:"Rato",cidade:"Matola",quantidade:22,preco:900,valor:19800},
+  {data:"2026-05-14",cliente:"Carlos Machava",produto:"Monitor",cidade:"Maputo",quantidade:6,preco:15000,valor:90000},
+  {data:"2026-05-16",cliente:"Luciana Bila",produto:"Impressora",cidade:"Boane",quantidade:3,preco:12500,valor:37500},
+  {data:"2026-05-18",cliente:"João Sitoe",produto:"Headphones",cidade:"Matola",quantidade:8,preco:3500,valor:28000},
+  {data:"2026-05-22",cliente:"Rui Tembe",produto:"Tablet",cidade:"Maputo",quantidade:2,preco:28000,valor:56000},
+  {data:"2026-05-24",cliente:"Ana Cossa",produto:"Laptop",cidade:"Maputo",quantidade:2,preco:45000,valor:90000},
+  {data:"2026-05-26",cliente:"Fátima Cumbe",produto:"Teclado",cidade:"Boane",quantidade:20,preco:1800,valor:36000},
+  {data:"2026-05-30",cliente:"Pedro Nhantumbo",produto:"Webcam",cidade:"Matola",quantidade:5,preco:4200,valor:21000},
+  {data:"2026-06-02",cliente:"Beatriz Langa",produto:"Teclado",cidade:"Matola",quantidade:14,preco:1800,valor:25200},
+  {data:"2026-06-03",cliente:"Ana Cossa",produto:"Laptop",cidade:"Boane",quantidade:1,preco:45000,valor:45000},
+  {data:"2026-06-06",cliente:"Sofia Guambe",produto:"Tablet",cidade:"Matola",quantidade:3,preco:28000,valor:84000},
+  {data:"2026-06-08",cliente:"Fátima Cumbe",produto:"Rato",cidade:"Boane",quantidade:28,preco:900,valor:25200},
+  {data:"2026-06-10",cliente:"Carlos Machava",produto:"Rato",cidade:"Maputo",quantidade:25,preco:900,valor:22500},
+  {data:"2026-06-13",cliente:"Rui Tembe",produto:"Headphones",cidade:"Boane",quantidade:10,preco:3500,valor:35000},
+  {data:"2026-06-15",cliente:"João Sitoe",produto:"Monitor",cidade:"Maputo",quantidade:5,preco:15000,valor:75000},
+  {data:"2026-06-17",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Maputo",quantidade:4,preco:8500,valor:34000},
+  {data:"2026-06-21",cliente:"Pedro Nhantumbo",produto:"Webcam",cidade:"Boane",quantidade:6,preco:4200,valor:25200},
+  {data:"2026-06-22",cliente:"Luciana Bila",produto:"Impressora",cidade:"Matola",quantidade:2,preco:12500,valor:25000},
+  {data:"2026-06-24",cliente:"João Sitoe",produto:"Monitor",cidade:"Matola",quantidade:3,preco:15000,valor:45000},
+  {data:"2026-06-28",cliente:"Sofia Guambe",produto:"Tablet",cidade:"Boane",quantidade:2,preco:28000,valor:56000},
+  {data:"2026-07-01",cliente:"Ana Cossa",produto:"Laptop",cidade:"Boane",quantidade:1,preco:45000,valor:45000},
+  {data:"2026-07-02",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Matola",quantidade:5,preco:8500,valor:42500},
+  {data:"2026-07-05",cliente:"Carlos Machava",produto:"Teclado",cidade:"Maputo",quantidade:18,preco:1800,valor:32400},
+  {data:"2026-07-08",cliente:"Fátima Cumbe",produto:"Teclado",cidade:"Boane",quantidade:16,preco:1800,valor:28800},
+  {data:"2026-07-09",cliente:"Rui Tembe",produto:"Headphones",cidade:"Maputo",quantidade:12,preco:3500,valor:42000},
+  {data:"2026-07-13",cliente:"Ana Cossa",produto:"Laptop",cidade:"Matola",quantidade:2,preco:45000,valor:90000},
+  {data:"2026-07-15",cliente:"Beatriz Langa",produto:"Rato",cidade:"Maputo",quantidade:32,preco:900,valor:28800},
+  {data:"2026-07-17",cliente:"Luciana Bila",produto:"Impressora",cidade:"Maputo",quantidade:3,preco:12500,valor:37500},
+  {data:"2026-07-21",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Boane",quantidade:6,preco:8500,valor:51000},
+  {data:"2026-07-22",cliente:"João Sitoe",produto:"Monitor",cidade:"Matola",quantidade:4,preco:15000,valor:60000},
+  {data:"2026-07-25",cliente:"Beatriz Langa",produto:"Rato",cidade:"Matola",quantidade:30,preco:900,valor:27000},
+  {data:"2026-07-28",cliente:"Luciana Bila",produto:"Impressora",cidade:"Boane",quantidade:3,preco:12500,valor:37500},
+  {data:"2026-07-29",cliente:"Sofia Guambe",produto:"Webcam",cidade:"Maputo",quantidade:4,preco:4200,valor:16800},
+  {data:"2026-08-02",cliente:"Rui Tembe",produto:"Tablet",cidade:"Maputo",quantidade:4,preco:28000,valor:112000},
+  {data:"2026-08-05",cliente:"João Sitoe",produto:"Monitor",cidade:"Boane",quantidade:5,preco:15000,valor:75000},
+  {data:"2026-08-09",cliente:"Carlos Machava",produto:"Headphones",cidade:"Matola",quantidade:7,preco:3500,valor:24500},
+  {data:"2026-08-13",cliente:"Sofia Guambe",produto:"Cadeira Gamer",cidade:"Maputo",quantidade:2,preco:18000,valor:36000},
+  {data:"2026-08-17",cliente:"Ana Cossa",produto:"Laptop",cidade:"Boane",quantidade:3,preco:45000,valor:135000},
+  {data:"2026-08-21",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Matola",quantidade:8,preco:8500,valor:68000},
+  {data:"2026-08-25",cliente:"Pedro Nhantumbo",produto:"Cadeira Gamer",cidade:"Matola",quantidade:1,preco:18000,valor:18000},
+  {data:"2026-08-28",cliente:"Fátima Cumbe",produto:"Teclado",cidade:"Boane",quantidade:22,preco:1800,valor:39600},
+  {data:"2026-09-01",cliente:"Beatriz Langa",produto:"Rato",cidade:"Maputo",quantidade:35,preco:900,valor:31500},
+  {data:"2026-09-05",cliente:"Pedro Nhantumbo",produto:"Webcam",cidade:"Matola",quantidade:7,preco:4200,valor:29400},
+  {data:"2026-09-09",cliente:"Carlos Machava",produto:"Cadeira Gamer",cidade:"Boane",quantidade:2,preco:18000,valor:36000},
+  {data:"2026-09-12",cliente:"Rui Tembe",produto:"Monitor",cidade:"Maputo",quantidade:7,preco:15000,valor:105000},
+  {data:"2026-09-16",cliente:"Sofia Guambe",produto:"Tablet",cidade:"Matola",quantidade:3,preco:28000,valor:84000},
+  {data:"2026-09-20",cliente:"Luciana Bila",produto:"Impressora",cidade:"Boane",quantidade:4,preco:12500,valor:50000},
+  {data:"2026-09-24",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Maputo",quantidade:10,preco:8500,valor:85000},
+  {data:"2026-09-28",cliente:"João Sitoe",produto:"Headphones",cidade:"Boane",quantidade:14,preco:3500,valor:49000},
+  {data:"2026-10-02",cliente:"Ana Cossa",produto:"Laptop",cidade:"Maputo",quantidade:4,preco:45000,valor:180000},
+  {data:"2026-10-05",cliente:"Carlos Machava",produto:"Cadeira Gamer",cidade:"Maputo",quantidade:3,preco:18000,valor:54000},
+  {data:"2026-10-08",cliente:"Fátima Cumbe",produto:"Rato",cidade:"Boane",quantidade:40,preco:900,valor:36000},
+  {data:"2026-10-11",cliente:"Beatriz Langa",produto:"Teclado",cidade:"Matola",quantidade:25,preco:1800,valor:45000},
+  {data:"2026-10-14",cliente:"Rui Tembe",produto:"Webcam",cidade:"Maputo",quantidade:9,preco:4200,valor:37800},
+  {data:"2026-10-17",cliente:"João Sitoe",produto:"Monitor",cidade:"Boane",quantidade:6,preco:15000,valor:90000},
+  {data:"2026-10-20",cliente:"Manuel Chaúque",produto:"SSD Externo",cidade:"Matola",quantidade:7,preco:8500,valor:59500},
+  {data:"2026-10-23",cliente:"Sofia Guambe",produto:"Tablet",cidade:"Boane",quantidade:5,preco:28000,valor:140000},
+  {data:"2026-10-26",cliente:"Pedro Nhantumbo",produto:"Cadeira Gamer",cidade:"Matola",quantidade:2,preco:18000,valor:36000},
+];
+
+let vendas = [];
+try {
+  const salvo = localStorage.getItem("muv_vendas_data");
+  vendas = salvo ? JSON.parse(salvo) : JSON.parse(JSON.stringify(VENDAS_INICIAIS));
+} catch (e) {
+  vendas = JSON.parse(JSON.stringify(VENDAS_INICIAIS));
+}
+
+// ────────────────────────────────────────────
+//  ESTADO DE INTERATIVIDADE & FILTROS ATIVOS
+// ────────────────────────────────────────────
+let filtroInterativo = {
+  tipo: null,      // 'produto', 'cidade', 'mes', 'cliente'
+  valor: null,     // ex: 'Laptop', 'Maputo', '02', 'Ana Cossa'
+  rotulo: null     // ex: 'Laptop (Produto)', 'Maputo (Cidade)'
+};
+
+let configGraficos = {
+  metricaMes: 'receita',       // 'receita', 'lucro', 'qtd'
+  metricaCidade: 'receita',    // 'receita', 'qtd'
+  visaoRentabilidade: 'todos'  // 'todos', 'top5'
+};
+
+const fmt  = n => Math.round(n).toLocaleString('pt-MZ') + ' MT';
+const fmtN = n => Math.round(n).toLocaleString('pt-MZ');
+
+function calcularMetricasVenda(v) {
+  const cfg = PRODUTOS_CONFIG[v.produto] || { preco: v.preco, custo: v.preco * 0.65 };
+  const custoTotal = cfg.custo * v.quantidade;
+  const lucro = v.valor - custoTotal;
+  return { custoTotal, lucro };
+}
+
+const PALETA = [
+  '#6c63ff','#00d4aa','#ff6b6b','#ffd166',
+  '#4ecdc4','#a78bfa','#f97316','#22d3ee',
+  '#84cc16','#e879f9'
+];
+
+const AVATAR_CORES = [
+  '#6c63ff','#00d4aa','#ff6b6b','#ffd166',
+  '#f97316','#22d3ee','#84cc16','#e879f9',
+  '#a78bfa','#4ecdc4'
+];
+
+let charts = {};
+
+// Helper cursor pointer no hover do Chart.js
+const onHoverPointer = (event, chartElement) => {
+  event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+};
+
+// ────────────────────────────────────────────
+//  INICIALIZAÇÃO DE SELECTS
+// ────────────────────────────────────────────
+function initSelectProdutos() {
+  const selectModal = document.getElementById('vendaProduto');
+  const selectFiltro = document.getElementById('filterProduto');
+  selectModal.innerHTML = '';
+  selectFiltro.innerHTML = '<option value="">Todos os Produtos</option>';
+
+  Object.keys(PRODUTOS_CONFIG).forEach(p => {
+    const optM = document.createElement('option');
+    optM.value = p;
+    optM.textContent = `${PRODUTOS_CONFIG[p].emoji} ${p} (${fmt(PRODUTOS_CONFIG[p].preco)})`;
+    selectModal.appendChild(optM);
+
+    const optF = document.createElement('option');
+    optF.value = p;
+    optF.textContent = p;
+    selectFiltro.appendChild(optF);
+  });
+}
+
+function initSelectClientes() {
+  const selectCliente = document.getElementById('filterCliente');
+  selectCliente.innerHTML = '<option value="">Todos os Clientes</option>';
+  const clientes = [...new Set(vendas.map(v => v.cliente))].sort();
+  clientes.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    selectCliente.appendChild(opt);
+  });
+}
+
+// ────────────────────────────────────────────
+//  ATUALIZAÇÃO GERAL DO DASHBOARD
+// ────────────────────────────────────────────
+function atualizarDashboard() {
+  // Aplicar filtro interativo (se houver) para calcular KPIs e métricas filtradas
+  const dadosBase = filtroInterativo.tipo ? vendas.filter(v => {
+    if (filtroInterativo.tipo === 'produto') return v.produto === filtroInterativo.valor;
+    if (filtroInterativo.tipo === 'cidade') return v.cidade === filtroInterativo.valor;
+    if (filtroInterativo.tipo === 'mes') return v.data.slice(5, 7) === filtroInterativo.valor;
+    if (filtroInterativo.tipo === 'cliente') return v.cliente === filtroInterativo.valor;
+    return true;
+  }) : vendas;
+
+  // Atualizar barra de filtro
+  const bar = document.getElementById('activeFilterBar');
+  if (filtroInterativo.tipo) {
+    bar.style.display = 'flex';
+    document.getElementById('activeFilterDesc').textContent =
+      `${filtroInterativo.rotulo} (${dadosBase.length} transações selecionadas)`;
+  } else {
+    bar.style.display = 'none';
+  }
+
+  // 1. Cálculos de KPIs
+  let receitaTotal = 0;
+  let lucroTotal = 0;
+  let unidadesTotal = 0;
+
+  const prodLucroMap = {};
+  const prodReceitaMap = {};
+  const prodQtdMap = {};
+  const cidadeReceitaMap = {};
+  const cidadeQtdMap = {};
+  const mesReceitaMap = {};
+  const mesLucroMap = {};
+  const mesQtdMap = {};
+
+  const mesesMap = {
+    '01':'Janeiro','02':'Fevereiro','03':'Março','04':'Abril',
+    '05':'Maio','06':'Junho','07':'Julho','08':'Agosto',
+    '09':'Setembro','10':'Outubro','11':'Novembro','12':'Dezembro'
+  };
+
+  dadosBase.forEach(v => {
+    const { lucro } = calcularMetricasVenda(v);
+    receitaTotal += v.valor;
+    lucroTotal += lucro;
+    unidadesTotal += v.quantidade;
+
+    // Agrupamento Produto
+    if (!prodLucroMap[v.produto]) {
+      prodLucroMap[v.produto] = 0;
+      prodReceitaMap[v.produto] = 0;
+      prodQtdMap[v.produto] = 0;
+    }
+    prodLucroMap[v.produto] += lucro;
+    prodReceitaMap[v.produto] += v.valor;
+    prodQtdMap[v.produto] += v.quantidade;
+
+    // Agrupamento Cidade
+    cidadeReceitaMap[v.cidade] = (cidadeReceitaMap[v.cidade] || 0) + v.valor;
+    cidadeQtdMap[v.cidade] = (cidadeQtdMap[v.cidade] || 0) + v.quantidade;
+
+    // Agrupamento Mês
+    const mesNum = v.data.slice(5, 7);
+    const mesNome = mesesMap[mesNum] || 'Outro';
+    mesReceitaMap[mesNome] = (mesReceitaMap[mesNome] || 0) + v.valor;
+    mesLucroMap[mesNome] = (mesLucroMap[mesNome] || 0) + lucro;
+    mesQtdMap[mesNome] = (mesQtdMap[mesNome] || 0) + v.quantidade;
+  });
+
+  const margemGeral = receitaTotal > 0 ? (lucroTotal / receitaTotal * 100).toFixed(1) : 0;
+
+  // Atualizar cards de KPI
+  document.getElementById('badgeTotalVendas').textContent = `${dadosBase.length} Vendas`;
+  document.getElementById('kpiReceita').textContent = fmt(receitaTotal);
+  document.getElementById('kpiLucro').textContent = fmt(lucroTotal);
+  document.getElementById('kpiMargem').textContent = `Margem média: ${margemGeral}%`;
+  document.getElementById('kpiUnidades').textContent = fmtN(unidadesTotal);
+  document.getElementById('kpiRegistos').textContent = `${dadosBase.length} transações`;
+
+  // Ranking de lucro
+  const rankingLucro = Object.entries(prodLucroMap).sort((a,b) => b[1] - a[1]);
+  if (rankingLucro.length > 0) {
+    const best = rankingLucro[0];
+    const worst = rankingLucro[rankingLucro.length - 1];
+
+    document.getElementById('kpiProdMaisLucro').textContent = best[0];
+    document.getElementById('kpiProdMaisLucroSub').textContent = `+ ${fmt(best[1])} lucro`;
+
+    document.getElementById('kpiProdMenosLucro').textContent = worst[0];
+    document.getElementById('kpiProdMenosLucroSub').textContent = `+ ${fmt(worst[1])} lucro`;
+
+    document.getElementById('destaqueBest').textContent = `${fmt(best[1])} de lucro (${fmt(prodReceitaMap[best[0]])} de receita)`;
+    document.getElementById('destaqueWorst').textContent = `${fmt(worst[1])} de lucro (${fmt(prodReceitaMap[worst[0]])} de receita)`;
+  }
+
+  // 2. Renderizar / Atualizar Gráficos Interativos
+  renderGraficoLucroComparativo(prodReceitaMap, prodLucroMap);
+  renderGraficoMes(mesReceitaMap, mesLucroMap, mesQtdMap);
+  renderGraficoCidade(cidadeReceitaMap, cidadeQtdMap);
+  renderGraficosProdutos(prodReceitaMap, prodQtdMap);
+
+  // 3. Rankings de Clientes
+  renderRankingsClientes(dadosBase);
+
+  // 4. Tabela
+  filtrarTabela();
+}
+
+// ────────────────────────────────────────────
+//  GRÁFICOS CHART.JS COM INTERATIVIDADE TOTAL
+// ────────────────────────────────────────────
+
+// 1. Gráfico de Rentabilidade (Receita vs Lucro)
+function renderGraficoLucroComparativo(receitas, lucros) {
+  let prods = Object.keys(receitas).sort((a, b) => receitas[b] - receitas[a]);
+  if (configGraficos.visaoRentabilidade === 'top5') {
+    prods = prods.slice(0, 5);
+  }
+
+  const dadosReceita = prods.map(p => receitas[p]);
+  const dadosLucro = prods.map(p => lucros[p]);
+
+  if (charts.lucro) charts.lucro.destroy();
+
+  charts.lucro = new Chart(document.getElementById('chartLucroComparativo'), {
+    type: 'bar',
+    data: {
+      labels: prods,
+      datasets: [
+        {
+          label: 'Receita Bruta (MT)',
+          data: dadosReceita,
+          backgroundColor: 'rgba(108, 99, 255, 0.75)',
+          hoverBackgroundColor: 'rgba(108, 99, 255, 1)',
+          borderRadius: 6,
+        },
+        {
+          label: 'Lucro Líquido Estimado (MT)',
+          data: dadosLucro,
+          backgroundColor: 'rgba(0, 212, 170, 0.9)',
+          hoverBackgroundColor: 'rgba(0, 212, 170, 1)',
+          borderRadius: 6,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onHover: onHoverPointer,
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const produto = prods[idx];
+          filtrarPorProdutoEspecifico(produto);
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#e8eaf6', font: { size: 12 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`,
+            afterBody: () => '👉 Clique na barra para filtrar por este produto'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b8fa8' }, grid: { display: false } },
+        y: {
+          ticks: { color: '#8b8fa8', callback: v => (v/1000) + 'k' },
+          grid: { color: 'rgba(46,49,72,.4)' }
+        }
+      }
+    }
+  });
+}
+
+// 2. Gráfico de Evolução Temporal
+function renderGraficoMes(mesReceita, mesLucro, mesQtd) {
+  const ordem = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const mesesNum = {'Janeiro':'01','Fevereiro':'02','Março':'03','Abril':'04','Maio':'05','Junho':'06','Julho':'07','Agosto':'08','Setembro':'09','Outubro':'10','Novembro':'11','Dezembro':'12'};
+  
+  const labels = ordem.filter(m => mesReceita[m] !== undefined);
+  let datasetData, labelMetrica, corBorda, corFundo;
+
+  if (configGraficos.metricaMes === 'lucro') {
+    datasetData = labels.map(m => mesLucro[m] || 0);
+    labelMetrica = 'Lucro Estimado (MT)';
+    corBorda = '#00d4aa';
+    corFundo = 'rgba(0,212,170,.18)';
+  } else if (configGraficos.metricaMes === 'qtd') {
+    datasetData = labels.map(m => mesQtd[m] || 0);
+    labelMetrica = 'Unidades Vendidas';
+    corBorda = '#ffd166';
+    corFundo = 'rgba(255,209,102,.18)';
+  } else {
+    datasetData = labels.map(m => mesReceita[m] || 0);
+    labelMetrica = 'Receita Bruta (MT)';
+    corBorda = '#6c63ff';
+    corFundo = 'rgba(108,99,255,.18)';
+  }
+
+  if (charts.mes) charts.mes.destroy();
+
+  charts.mes = new Chart(document.getElementById('chartMes'), {
+    type: 'line',
+    data: {
+      labels: labels.map(m => m.slice(0,3)),
+      datasets: [{
+        label: labelMetrica,
+        data: datasetData,
+        borderColor: corBorda,
+        backgroundColor: corFundo,
+        pointBackgroundColor: corBorda,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverRadius: 7,
+        pointRadius: 5,
+        tension: 0.35,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onHover: onHoverPointer,
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const mesNome = labels[idx];
+          const mesCodigo = mesesNum[mesNome];
+          ativarFiltroInterativo('mes', mesCodigo, `Mês: ${mesNome}`);
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${labelMetrica}: ${configGraficos.metricaMes === 'qtd' ? fmtN(ctx.parsed.y) + ' un.' : fmt(ctx.parsed.y)}`,
+            afterBody: () => '👉 Clique no ponto para filtrar por este mês'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b8fa8' }, grid: { color: 'rgba(46,49,72,.4)' } },
+        y: {
+          ticks: {
+            color: '#8b8fa8',
+            callback: v => configGraficos.metricaMes === 'qtd' ? v : (v/1000)+'k'
+          },
+          grid: { color: 'rgba(46,49,72,.4)' }
+        }
+      }
+    }
+  });
+}
+
+// 3. Gráfico de Cidades
+function renderGraficoCidade(cidadeReceita, cidadeQtd) {
+  const cidades = Object.keys(cidadeReceita);
+  const isQtd = configGraficos.metricaCidade === 'qtd';
+  const valores = cidades.map(c => isQtd ? cidadeQtd[c] : cidadeReceita[c]);
+  const total = valores.reduce((a, b) => a + b, 0);
+
+  if (charts.cidade) charts.cidade.destroy();
+
+  charts.cidade = new Chart(document.getElementById('chartCidade'), {
+    type: 'doughnut',
+    data: {
+      labels: cidades,
+      datasets: [{
+        data: valores,
+        backgroundColor: ['#6c63ff', '#00d4aa', '#ffd166', '#ff6b6b'],
+        hoverBackgroundColor: ['#837bff', '#24e3bc', '#ffe08a', '#ff8585'],
+        borderColor: '#1a1d27',
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      onHover: onHoverPointer,
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const cidade = cidades[idx];
+          ativarFiltroInterativo('cidade', cidade, `Cidade: ${cidade}`);
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#e8eaf6', padding: 14, font: { size: 12 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const val = ctx.parsed;
+              const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+              return isQtd
+                ? ` ${ctx.label}: ${fmtN(val)} un. (${pct}%)`
+                : ` ${ctx.label}: ${fmt(val)} (${pct}%)`;
+            },
+            afterBody: () => '👉 Clique na fatia para filtrar por esta cidade'
+          }
+        }
+      }
+    }
+  });
+}
+
+// 4. Gráficos de Produtos (Receita, Quantidade, Doughnut Share)
+function renderGraficosProdutos(receitas, qtds) {
+  const sorted = Object.entries(receitas).sort((a,b) => b[1] - a[1]);
+  const prods = sorted.map(s => s[0]);
+  const recVals = sorted.map(s => s[1]);
+  const totalRec = recVals.reduce((a,b) => a+b, 0);
+
+  const sortedQtd = Object.entries(qtds).sort((a,b) => b[1] - a[1]);
+  const prodsQtd = sortedQtd.map(s => s[0]);
+  const qtdVals = sortedQtd.map(s => s[1]);
+
+  // A. Receita por produto (Bar horizontal)
+  if (charts.prodRec) charts.prodRec.destroy();
+  charts.prodRec = new Chart(document.getElementById('chartProdReceita'), {
+    type: 'bar',
+    data: {
+      labels: prods,
+      datasets: [{
+        label: 'Receita (MT)',
+        data: recVals,
+        backgroundColor: PALETA,
+        hoverBackgroundColor: PALETA.map(c => '#ffffff'),
+        borderRadius: 5
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      onHover: onHoverPointer,
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const produto = prods[elements[0].index];
+          filtrarPorProdutoEspecifico(produto);
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` Receita: ${fmt(ctx.parsed.x)}`,
+            afterBody: () => '👉 Clique para filtrar por este produto'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b8fa8', callback: v => (v/1000)+'k' }, grid: { color: 'rgba(46,49,72,.4)' } },
+        y: { ticks: { color: '#e8eaf6', font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // B. Quantidade por produto (Bar vertical)
+  if (charts.prodQtd) charts.prodQtd.destroy();
+  charts.prodQtd = new Chart(document.getElementById('chartProdQtd'), {
+    type: 'bar',
+    data: {
+      labels: prodsQtd,
+      datasets: [{
+        label: 'Unidades',
+        data: qtdVals,
+        backgroundColor: PALETA.map(c => c + 'cc'),
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onHover: onHoverPointer,
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const produto = prodsQtd[elements[0].index];
+          filtrarPorProdutoEspecifico(produto);
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` Qtd: ${fmtN(ctx.parsed.y)} unidades`,
+            afterBody: () => '👉 Clique para filtrar por este produto'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b8fa8', font: { size: 10 }, maxRotation: 45 }, grid: { display: false } },
+        y: { ticks: { color: '#8b8fa8' }, grid: { color: 'rgba(46,49,72,.4)' } }
+      }
+    }
+  });
+
+  // C. Market Share Doughnut
+  if (charts.doughnut) charts.doughnut.destroy();
+  charts.doughnut = new Chart(document.getElementById('chartDoughnut'), {
+    type: 'pie',
+    data: {
+      labels: prods,
+      datasets: [{
+        data: recVals,
+        backgroundColor: PALETA,
+        borderColor: '#1a1d27',
+        borderWidth: 2,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onHover: onHoverPointer,
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const produto = prods[elements[0].index];
+          filtrarPorProdutoEspecifico(produto);
+        }
+      },
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { color: '#8b8fa8', padding: 6, font: { size: 9.5 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const val = ctx.parsed;
+              const pct = totalRec > 0 ? ((val / totalRec) * 100).toFixed(1) : 0;
+              return ` ${ctx.label}: ${pct}% (${fmt(val)})`;
+            },
+            afterBody: () => '👉 Clique para filtrar por este produto'
+          }
+        }
+      }
+    }
+  });
+}
+
+// ────────────────────────────────────────────
+//  CONTROLES DE VISÃO INTERATIVA DOS GRÁFICOS
+// ────────────────────────────────────────────
+function alternarVisaoRentabilidade(visao) {
+  configGraficos.visaoRentabilidade = visao;
+  document.getElementById('btnLucroTodos').classList.toggle('active', visao === 'todos');
+  document.getElementById('btnLucroTop5').classList.toggle('active', visao === 'top5');
+  atualizarDashboard();
+}
+
+function alternarMetricaMes(metrica) {
+  configGraficos.metricaMes = metrica;
+  document.getElementById('btnMetricaReceita').classList.toggle('active', metrica === 'receita');
+  document.getElementById('btnMetricaLucro').classList.toggle('active', metrica === 'lucro');
+  document.getElementById('btnMetricaQtd').classList.toggle('active', metrica === 'qtd');
+  atualizarDashboard();
+}
+
+function alternarMetricaCidade(metrica) {
+  configGraficos.metricaCidade = metrica;
+  document.getElementById('btnCidadeReceita').classList.toggle('active', metrica === 'receita');
+  document.getElementById('btnCidadeQtd').classList.toggle('active', metrica === 'qtd');
+  atualizarDashboard();
+}
+
+// ────────────────────────────────────────────
+//  FILTRAGEM INTERATIVA CROSS-FILTER
+// ────────────────────────────────────────────
+function ativarFiltroInterativo(tipo, valor, rotulo) {
+  filtroInterativo = { tipo, valor, rotulo };
+  
+  // Atualizar selects de controle caso corresponda
+  if (tipo === 'produto') document.getElementById('filterProduto').value = valor;
+  if (tipo === 'cidade') document.getElementById('filterCidade').value = valor;
+  if (tipo === 'cliente') document.getElementById('filterCliente').value = valor;
+
+  atualizarDashboard();
+  mostrarToast(`Filtrado por: ${rotulo}`, "🎯");
+}
+
+function filtrarPorProdutoEspecifico(prod) {
+  ativarFiltroInterativo('produto', prod, `Produto: ${prod}`);
+}
+
+function filtrarPorClienteEspecifico(cli) {
+  ativarFiltroInterativo('cliente', cli, `Cliente: ${cli}`);
+}
+
+function limparFiltroInterativo() {
+  filtroInterativo = { tipo: null, valor: null, rotulo: null };
+  document.getElementById('filterProduto').value = '';
+  document.getElementById('filterCidade').value = '';
+  document.getElementById('filterCliente').value = '';
+  document.getElementById('searchInput').value = '';
+  atualizarDashboard();
+  mostrarToast("Filtros do gráfico removidos!", "↺");
+}
+
+// ────────────────────────────────────────────
+//  EXPORTAÇÃO DE GRÁFICO EM PNG
+// ────────────────────────────────────────────
+function baixarGraficoPNG(canvasId, nomeArquivo) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = nomeArquivo;
+  link.href = canvas.toDataURL('image/png', 1.0);
+  link.click();
+  mostrarToast(`Gráfico exportado como imagem PNG!`, "📷");
+}
+
+// ────────────────────────────────────────────
+//  RANKINGS DE CLIENTES
+// ────────────────────────────────────────────
+function renderRankingsClientes(dados) {
+  const clienteMap = {};
+  dados.forEach(v => {
+    if (!clienteMap[v.cliente]) clienteMap[v.cliente] = { valor: 0, qtd: 0 };
+    clienteMap[v.cliente].valor += v.valor;
+    clienteMap[v.cliente].qtd += v.quantidade;
+  });
+
+  const porValor = Object.entries(clienteMap).map(([nome, d]) => ({ nome, ...d })).sort((a,b) => b.valor - a.valor);
+  const porQtd = Object.entries(clienteMap).map(([nome, d]) => ({ nome, ...d })).sort((a,b) => b.qtd - a.qtd);
+
+  const containerValor = document.getElementById('clientesPorValor');
+  const containerQtd = document.getElementById('clientesPorQtd');
+  containerValor.innerHTML = '';
+  containerQtd.innerHTML = '';
+
+  const maxVal = porValor[0]?.valor || 1;
+  const maxQtd = porQtd[0]?.qtd || 1;
+
+  porValor.slice(0, 10).forEach((c, i) => {
+    containerValor.appendChild(criarRowCliente(c, i, 'valor', maxVal));
+  });
+
+  porQtd.slice(0, 10).forEach((c, i) => {
+    containerQtd.appendChild(criarRowCliente(c, i, 'qtd', maxQtd));
+  });
+}
+
+function criarRowCliente(c, i, campo, max) {
+  const pct = Math.round((c[campo] / max) * 100);
+  const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+  const cor = AVATAR_CORES[i % AVATAR_CORES.length];
+  const iniciais = c.nome.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+  const label = campo === 'valor' ? fmt(c.valor) : `${fmtN(c.qtd)} un.`;
+
+  const div = document.createElement('div');
+  div.className = 'cliente-row';
+  div.title = `Clique para ver apenas as vendas de ${c.nome}`;
+  div.onclick = () => filtrarPorClienteEspecifico(c.nome);
+  div.innerHTML = `
+    <div class="cliente-rank ${rankClass}">${i + 1}</div>
+    <div class="cliente-avatar" style="background:${cor}22;color:${cor}">${iniciais}</div>
+    <div class="cliente-info">
+      <div class="cliente-nome">${c.nome}</div>
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%;background:${cor}"></div></div>
+    </div>
+    <div class="cliente-valor">${label}</div>
+  `;
+  return div;
+}
+
+// ────────────────────────────────────────────
+//  TABELA DE VENDAS & FILTRAGEM
+// ────────────────────────────────────────────
+function cidadeClass(c) {
+  if (c === 'Maputo') return 'cidade-maputo';
+  if (c === 'Matola') return 'cidade-matola';
+  return 'cidade-boane';
+}
+
+function renderTabela(dados) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  dados.forEach((v, i) => {
+    const cfg = PRODUTOS_CONFIG[v.produto] || { emoji: '📦' };
+    const { lucro } = calcularMetricasVenda(v);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-size:.8rem">${i + 1}</td>
+      <td>${v.data}</td>
+      <td><strong style="cursor:pointer;" onclick="filtrarPorClienteEspecifico('${v.cliente}')" title="Filtrar por este cliente">${v.cliente}</strong></td>
+      <td><span class="produto-badge" style="background:rgba(108,99,255,.1);color:#a78bfa" onclick="filtrarPorProdutoEspecifico('${v.produto}')" title="Filtrar por este produto">${cfg.emoji} ${v.produto}</span></td>
+      <td><span class="cidade-tag ${cidadeClass(v.cidade)}" onclick="ativarFiltroInterativo('cidade', '${v.cidade}', 'Cidade: ${v.cidade}')" title="Filtrar por esta cidade">${v.cidade}</span></td>
+      <td style="text-align:center">${v.quantidade}</td>
+      <td style="color:var(--muted)">${fmtN(v.preco)} MT</td>
+      <td class="valor">${fmtN(v.valor)} MT</td>
+      <td style="color:var(--accent2);font-weight:600">+${fmtN(lucro)} MT</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('tableCount').textContent = `Mostrando ${dados.length} de ${vendas.length} registos`;
+}
+
+function filtrarTabela() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const cid = document.getElementById('filterCidade').value;
+  const prod = document.getElementById('filterProduto').value;
+  const cli = document.getElementById('filterCliente').value;
+
+  const filtrados = vendas.filter(v =>
+    (!q || v.cliente.toLowerCase().includes(q) || v.produto.toLowerCase().includes(q) || v.cidade.toLowerCase().includes(q)) &&
+    (!cid || v.cidade === cid) &&
+    (!prod || v.produto === prod) &&
+    (!cli || v.cliente === cli) &&
+    (!filtroInterativo.tipo || (
+      filtroInterativo.tipo === 'produto' ? v.produto === filtroInterativo.valor :
+      filtroInterativo.tipo === 'cidade' ? v.cidade === filtroInterativo.valor :
+      filtroInterativo.tipo === 'mes' ? v.data.slice(5, 7) === filtroInterativo.valor :
+      filtroInterativo.tipo === 'cliente' ? v.cliente === filtroInterativo.valor : true
+    ))
+  );
+
+  renderTabela(filtrados);
+}
+
+document.getElementById('searchInput').addEventListener('input', filtrarTabela);
+document.getElementById('filterCidade').addEventListener('change', e => {
+  if (e.target.value) ativarFiltroInterativo('cidade', e.target.value, `Cidade: ${e.target.value}`);
+  else limparFiltroInterativo();
+});
+document.getElementById('filterProduto').addEventListener('change', e => {
+  if (e.target.value) ativarFiltroInterativo('produto', e.target.value, `Produto: ${e.target.value}`);
+  else limparFiltroInterativo();
+});
+document.getElementById('filterCliente').addEventListener('change', e => {
+  if (e.target.value) ativarFiltroInterativo('cliente', e.target.value, `Cliente: ${e.target.value}`);
+  else limparFiltroInterativo();
+});
+
+// ────────────────────────────────────────────
+//  MODAL DE REGISTO DE NOVA VENDA
+// ────────────────────────────────────────────
+function abrirModalVenda() {
+  const modal = document.getElementById('modalVenda');
+  document.getElementById('vendaData').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('vendaCliente').value = '';
+  document.getElementById('vendaQtd').value = 1;
+  atualizarPrecoSugerido();
+  modal.classList.add('active');
+}
+
+function fecharModalVenda() {
+  document.getElementById('modalVenda').classList.remove('active');
+}
+
+function atualizarPrecoSugerido() {
+  const prod = document.getElementById('vendaProduto').value;
+  const cfg = PRODUTOS_CONFIG[prod];
+  if (cfg) {
+    document.getElementById('vendaPreco').value = cfg.preco;
+  }
+  calcularTotalModal();
+}
+
+function calcularTotalModal() {
+  const qtd = parseInt(document.getElementById('vendaQtd').value) || 0;
+  const preco = parseFloat(document.getElementById('vendaPreco').value) || 0;
+  const total = qtd * preco;
+  document.getElementById('modalTotalLabel').textContent = fmt(total);
+}
+
+async function salvarNovaVenda(e) {
+  e.preventDefault();
+
+  const novaVenda = {
+    data: document.getElementById('vendaData').value,
+    cliente: document.getElementById('vendaCliente').value.trim(),
+    produto: document.getElementById('vendaProduto').value,
+    cidade: document.getElementById('vendaCidade').value,
+    quantidade: parseInt(document.getElementById('vendaQtd').value),
+    preco: parseFloat(document.getElementById('vendaPreco').value),
+    valor: parseInt(document.getElementById('vendaQtd').value) * parseFloat(document.getElementById('vendaPreco').value)
+  };
+
+  vendas.unshift(novaVenda);
+
+  try {
+    localStorage.setItem("muv_vendas_data", JSON.stringify(vendas));
+  } catch (err) {}
+
+  try {
+    await fetch("/api/vendas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: novaVenda.data,
+        cliente: novaVenda.cliente,
+        produto: novaVenda.produto,
+        cidade: novaVenda.cidade,
+        quantidade: novaVenda.quantidade,
+        preco_unitario: novaVenda.preco,
+        valor_venda: novaVenda.valor
+      })
+    });
+  } catch (err) {}
+
+  fecharModalVenda();
+  initSelectClientes();
+  atualizarDashboard();
+  mostrarToast(`Venda de ${novaVenda.produto} registada com sucesso!`);
+}
+
+function restaurarDadosOriginais() {
+  if (confirm("Tem certeza que deseja restaurar as 100 vendas padrão originais?")) {
+    vendas = JSON.parse(JSON.stringify(VENDAS_INICIAIS));
+    localStorage.removeItem("muv_vendas_data");
+    limparFiltroInterativo();
+    initSelectClientes();
+    atualizarDashboard();
+    mostrarToast("Dados restaurados para o padrão de 100 vendas!");
+  }
+}
+
+// ────────────────────────────────────────────
+//  EXPORTAÇÃO DE CSV
+// ────────────────────────────────────────────
+function exportarCSV() {
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "data,cliente,produto,cidade,quantidade,preco_unitario,valor_venda,lucro_estimado\n";
+
+  vendas.forEach(v => {
+    const { lucro } = calcularMetricasVenda(v);
+    const linha = [
+      v.data,
+      `"${v.cliente}"`,
+      `"${v.produto}"`,
+      `"${v.cidade}"`,
+      v.quantidade,
+      v.preco,
+      v.valor,
+      lucro
+    ].join(",");
+    csvContent += linha + "\n";
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `muv_vendas_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  mostrarToast("Ficheiro CSV gerado e descarregado com sucesso!");
+}
+
+// ────────────────────────────────────────────
+//  TOAST DE NOTIFICAÇÃO
+// ────────────────────────────────────────────
+function mostrarToast(mensagem, icone = "✅") {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = mensagem;
+  document.getElementById('toastIcon').textContent = icone;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ────────────────────────────────────────────
+//  INICIALIZAÇÃO
+// ────────────────────────────────────────────
+initSelectProdutos();
+initSelectClientes();
+atualizarDashboard();
+</script>
+</body>
+</html>

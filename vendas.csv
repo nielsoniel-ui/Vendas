@@ -1,0 +1,101 @@
+data,cliente,produto,cidade,quantidade,preco_unitario,valor_venda
+2026-01-03,Carlos Machava,Headphones,Maputo,3,3500,10500
+2026-01-05,Ana Cossa,Laptop,Maputo,2,45000,90000
+2026-01-08,João Sitoe,Monitor,Matola,3,15000,45000
+2026-01-12,Beatriz Langa,Teclado,Maputo,8,1800,14400
+2026-01-15,Pedro Nhantumbo,Tablet,Boane,1,28000,28000
+2026-01-18,Fátima Cumbe,Rato,Boane,10,900,9000
+2026-01-22,Manuel Chaúque,SSD Externo,Matola,2,8500,17000
+2026-01-25,Ana Cossa,Laptop,Matola,1,45000,45000
+2026-01-29,Sofia Guambe,Cadeira Gamer,Maputo,1,18000,18000
+2026-02-03,Carlos Machava,Monitor,Maputo,4,15000,60000
+2026-02-06,João Sitoe,Headphones,Matola,4,3500,14000
+2026-02-09,Fátima Cumbe,Teclado,Boane,12,1800,21600
+2026-02-12,Rui Tembe,Tablet,Maputo,2,28000,56000
+2026-02-14,Beatriz Langa,Rato,Matola,15,900,13500
+2026-02-18,Pedro Nhantumbo,SSD Externo,Boane,3,8500,25500
+2026-02-20,Luciana Bila,Impressora,Maputo,2,12500,25000
+2026-02-25,Manuel Chaúque,Cadeira Gamer,Matola,1,18000,18000
+2026-02-27,Ana Cossa,Laptop,Boane,2,45000,90000
+2026-03-02,Carlos Machava,Headphones,Boane,6,3500,21000
+2026-03-04,João Sitoe,Monitor,Matola,5,15000,75000
+2026-03-08,Rui Tembe,Tablet,Matola,1,28000,28000
+2026-03-10,Sofia Guambe,Teclado,Maputo,10,1800,18000
+2026-03-14,Beatriz Langa,SSD Externo,Maputo,4,8500,34000
+2026-03-16,Fátima Cumbe,Rato,Boane,20,900,18000
+2026-03-20,Pedro Nhantumbo,Cadeira Gamer,Boane,2,18000,36000
+2026-03-22,Luciana Bila,Impressora,Matola,3,12500,37500
+2026-03-26,Carlos Machava,Webcam,Maputo,3,4200,12600
+2026-03-29,Ana Cossa,Laptop,Maputo,3,45000,135000
+2026-04-01,Rui Tembe,Headphones,Maputo,9,3500,31500
+2026-04-06,João Sitoe,Monitor,Boane,4,15000,60000
+2026-04-08,Sofia Guambe,Tablet,Boane,3,28000,84000
+2026-04-11,Beatriz Langa,Teclado,Matola,15,1800,27000
+2026-04-14,Manuel Chaúque,SSD Externo,Matola,5,8500,42500
+2026-04-17,Fátima Cumbe,Rato,Maputo,18,900,16200
+2026-04-20,Carlos Machava,Cadeira Gamer,Maputo,2,18000,36000
+2026-04-23,Luciana Bila,Impressora,Boane,2,12500,25000
+2026-04-26,Pedro Nhantumbo,Webcam,Boane,4,4200,16800
+2026-04-28,Ana Cossa,Laptop,Matola,2,45000,90000
+2026-05-02,Rui Tembe,Headphones,Maputo,5,3500,17500
+2026-05-04,João Sitoe,Monitor,Boane,4,15000,60000
+2026-05-07,Manuel Chaúque,Impressora,Matola,4,12500,50000
+2026-05-10,Sofia Guambe,Webcam,Boane,3,4200,12600
+2026-05-12,Beatriz Langa,Rato,Matola,22,900,19800
+2026-05-14,Carlos Machava,Monitor,Maputo,6,15000,90000
+2026-05-16,Luciana Bila,Impressora,Boane,3,12500,37500
+2026-05-18,João Sitoe,Headphones,Matola,8,3500,28000
+2026-05-22,Rui Tembe,Tablet,Maputo,2,28000,56000
+2026-05-24,Ana Cossa,Laptop,Maputo,2,45000,90000
+2026-05-26,Fátima Cumbe,Teclado,Boane,20,1800,36000
+2026-05-30,Pedro Nhantumbo,Webcam,Matola,5,4200,21000
+2026-06-02,Beatriz Langa,Teclado,Matola,14,1800,25200
+2026-06-03,Ana Cossa,Laptop,Boane,1,45000,45000
+2026-06-06,Sofia Guambe,Tablet,Matola,3,28000,84000
+2026-06-08,Fátima Cumbe,Rato,Boane,28,900,25200
+2026-06-10,Carlos Machava,Rato,Maputo,25,900,22500
+2026-06-13,Rui Tembe,Headphones,Boane,10,3500,35000
+2026-06-15,João Sitoe,Monitor,Maputo,5,15000,75000
+2026-06-17,Manuel Chaúque,SSD Externo,Maputo,4,8500,34000
+2026-06-21,Pedro Nhantumbo,Webcam,Boane,6,4200,25200
+2026-06-22,Luciana Bila,Impressora,Matola,2,12500,25000
+2026-06-24,João Sitoe,Monitor,Matola,3,15000,45000
+2026-06-28,Sofia Guambe,Tablet,Boane,2,28000,56000
+2026-07-01,Ana Cossa,Laptop,Boane,1,45000,45000
+2026-07-02,Manuel Chaúque,SSD Externo,Matola,5,8500,42500
+2026-07-05,Carlos Machava,Teclado,Maputo,18,1800,32400
+2026-07-08,Fátima Cumbe,Teclado,Boane,16,1800,28800
+2026-07-09,Rui Tembe,Headphones,Maputo,12,3500,42000
+2026-07-13,Ana Cossa,Laptop,Matola,2,45000,90000
+2026-07-15,Beatriz Langa,Rato,Maputo,32,900,28800
+2026-07-17,Luciana Bila,Impressora,Maputo,3,12500,37500
+2026-07-21,Manuel Chaúque,SSD Externo,Boane,6,8500,51000
+2026-07-22,João Sitoe,Monitor,Matola,4,15000,60000
+2026-07-25,Beatriz Langa,Rato,Matola,30,900,27000
+2026-07-28,Luciana Bila,Impressora,Boane,3,12500,37500
+2026-07-29,Sofia Guambe,Webcam,Maputo,4,4200,16800
+2026-08-02,Rui Tembe,Tablet,Maputo,4,28000,112000
+2026-08-05,João Sitoe,Monitor,Boane,5,15000,75000
+2026-08-09,Carlos Machava,Headphones,Matola,7,3500,24500
+2026-08-13,Sofia Guambe,Cadeira Gamer,Maputo,2,18000,36000
+2026-08-17,Ana Cossa,Laptop,Boane,3,45000,135000
+2026-08-21,Manuel Chaúque,SSD Externo,Matola,8,8500,68000
+2026-08-25,Pedro Nhantumbo,Cadeira Gamer,Matola,1,18000,18000
+2026-08-28,Fátima Cumbe,Teclado,Boane,22,1800,39600
+2026-09-01,Beatriz Langa,Rato,Maputo,35,900,31500
+2026-09-05,Pedro Nhantumbo,Webcam,Matola,7,4200,29400
+2026-09-09,Carlos Machava,Cadeira Gamer,Boane,2,18000,36000
+2026-09-12,Rui Tembe,Monitor,Maputo,7,15000,105000
+2026-09-16,Sofia Guambe,Tablet,Matola,3,28000,84000
+2026-09-20,Luciana Bila,Impressora,Boane,4,12500,50000
+2026-09-24,Manuel Chaúque,SSD Externo,Maputo,10,8500,85000
+2026-09-28,João Sitoe,Headphones,Boane,14,3500,49000
+2026-10-02,Ana Cossa,Laptop,Maputo,4,45000,180000
+2026-10-05,Carlos Machava,Cadeira Gamer,Maputo,3,18000,54000
+2026-10-08,Fátima Cumbe,Rato,Boane,40,900,36000
+2026-10-11,Beatriz Langa,Teclado,Matola,25,1800,45000
+2026-10-14,Rui Tembe,Webcam,Maputo,9,4200,37800
+2026-10-17,João Sitoe,Monitor,Boane,6,15000,90000
+2026-10-20,Manuel Chaúque,SSD Externo,Matola,7,8500,59500
+2026-10-23,Sofia Guambe,Tablet,Boane,5,28000,140000
+2026-10-26,Pedro Nhantumbo,Cadeira Gamer,Matola,2,18000,36000
